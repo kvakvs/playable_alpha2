@@ -16,19 +16,19 @@ public class Voxel {
 	public VoxelType vtype;
 	public uint      variety;
 
-	public Vector2 position, xEdgePosition, yEdgePosition;
+	public Vector2 tl;
+	public Vector2 br;
 
 	public Voxel (int x, int y, float size) {
 		vtype = VoxelType.Empty;
 		variety = 0;
 
-		position.x = (x + 0.5f) * size;
-		position.y = (y + 0.5f) * size;
+		tl.x = x * size;
+		tl.y = y * size;
 
-		xEdgePosition = position;
-		xEdgePosition.x += size * 0.5f;
-		yEdgePosition = position;
-		yEdgePosition.y += size * 0.5f;
+		br = tl;
+		br.x += size;
+		br.y += size;
 	}
 
 	public Voxel () {}
@@ -66,38 +66,5 @@ public class Voxel {
 		uv[1].Set(u + u_step, v);
 		uv[2].Set(u,          v + v_step);
 		uv[3].Set(u + u_step, v + v_step);
-	}
-
-	public void BecomeXDummyOf (Voxel other, float offset) {
-		vtype = other.vtype;
-		position = other.position;
-		xEdgePosition = other.xEdgePosition;
-		yEdgePosition = other.yEdgePosition;
-		position.x += offset;
-		xEdgePosition.x += offset;
-		yEdgePosition.x += offset;
-	}
-
-	public void BecomeYDummyOf (Voxel other, float offset) {
-		vtype = other.vtype;
-		position = other.position;
-		xEdgePosition = other.xEdgePosition;
-		yEdgePosition = other.yEdgePosition;
-		position.y += offset;
-		xEdgePosition.y += offset;
-		yEdgePosition.y += offset;
-	}
-
-	public void BecomeXYDummyOf (Voxel other, float offset) {
-		vtype = other.vtype;
-		position = other.position;
-		xEdgePosition = other.xEdgePosition;
-		yEdgePosition = other.yEdgePosition;
-		position.x += offset;
-		position.y += offset;
-		xEdgePosition.x += offset;
-		xEdgePosition.y += offset;
-		yEdgePosition.x += offset;
-		yEdgePosition.y += offset;
 	}
 }

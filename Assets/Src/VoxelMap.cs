@@ -8,8 +8,8 @@ public class VoxelMap : MonoBehaviour {
 
 	public float size = 2f;
 
-	public int voxelResolution = 8;
-	public int chunkResolution = 2;
+	public int VoxelsPerChunk = 8;
+	public int ChunksVisible = 2;
 
 	public VoxelGrid voxelGridPrefab;
 
@@ -26,12 +26,12 @@ public class VoxelMap : MonoBehaviour {
 	
 	private void Awake () {
 		halfSize = size * 0.5f;
-		chunkSize = size / chunkResolution;
-		voxelSize = chunkSize / voxelResolution;
+		chunkSize = size / ChunksVisible;
+		voxelSize = chunkSize / VoxelsPerChunk;
 		
-		chunks = new VoxelGrid[chunkResolution * chunkResolution];
-		for (int i = 0, y = 0; y < chunkResolution; y++) {
-			for (int x = 0; x < chunkResolution; x++, i++) {
+		chunks = new VoxelGrid[ChunksVisible * ChunksVisible];
+		for (int i = 0, y = 0; y < ChunksVisible; y++) {
+			for (int x = 0; x < ChunksVisible; x++, i++) {
 				CreateChunk(i, x, y);
 			}
 		}
@@ -41,7 +41,7 @@ public class VoxelMap : MonoBehaviour {
 
 	private void CreateChunk (int i, int x, int y) {
 		VoxelGrid chunk = Instantiate(voxelGridPrefab) as VoxelGrid;
-		chunk.Initialize(voxelResolution, chunkSize);
+		chunk.Initialize(VoxelsPerChunk, chunkSize, x * VoxelsPerChunk, y * VoxelsPerChunk);
 		chunk.transform.parent = transform;
 		chunk.transform.localPosition = new Vector3(x * chunkSize - halfSize, y * chunkSize - halfSize);
 		chunks[i] = chunk;
@@ -49,9 +49,9 @@ public class VoxelMap : MonoBehaviour {
 			chunks[i - 1].xNeighbor = chunk;
 		}
 		if (y > 0) {
-			chunks[i - chunkResolution].yNeighbor = chunk;
+			chunks[i - ChunksVisible].yNeighbor = chunk;
 			if (x > 0) {
-				chunks[i - chunkResolution - 1].xyNeighbor = chunk;
+				chunks[i - ChunksVisible - 1].xyNeighbor = chunk;
 			}
 		}
 	}
@@ -71,36 +71,36 @@ public class VoxelMap : MonoBehaviour {
 		int centerX = (int)((point.x + halfSize) / voxelSize);
 		int centerY = (int)((point.y + halfSize) / voxelSize);
 
-		int xStart = (centerX - radiusIndex - 1) / voxelResolution;
+		int xStart = (centerX - radiusIndex - 1) / VoxelsPerChunk;
 		if (xStart < 0) {
 			xStart = 0;
 		}
-		int xEnd = (centerX + radiusIndex) / voxelResolution;
-		if (xEnd >= chunkResolution) {
-			xEnd = chunkResolution - 1;
+		int xEnd = (centerX + radiusIndex) / VoxelsPerChunk;
+		if (xEnd >= ChunksVisible) {
+			xEnd = ChunksVisible - 1;
 		}
-		int yStart = (centerY - radiusIndex - 1) / voxelResolution;
+		int yStart = (centerY - radiusIndex - 1) / VoxelsPerChunk;
 		if (yStart < 0) {
 			yStart = 0;
 		}
-		int yEnd = (centerY + radiusIndex) / voxelResolution;
-		if (yEnd >= chunkResolution) {
-			yEnd = chunkResolution - 1;
+		int yEnd = (centerY + radiusIndex) / VoxelsPerChunk;
+		if (yEnd >= ChunksVisible) {
+			yEnd = ChunksVisible - 1;
 		}
 
 		VoxelStencil activeStencil = stencils[stencilIndex];
 		activeStencil.Initialize((VoxelType)fillTypeIndex, radiusIndex);
 
-		int voxelYOffset = yEnd * voxelResolution;
+		int voxelYOffset = yEnd * VoxelsPerChunk;
 		for (int y = yEnd; y >= yStart; y--) {
-			int i = y * chunkResolution + xEnd;
-			int voxelXOffset = xEnd * voxelResolution;
+			int i = y * ChunksVisible + xEnd;
+			int voxelXOffset = xEnd * VoxelsPerChunk;
 			for (int x = xEnd; x >= xStart; x--, i--) {
 				activeStencil.SetCenter(centerX - voxelXOffset, centerY - voxelYOffset);
 				chunks[i].Apply(activeStencil);
-				voxelXOffset -= voxelResolution;
+				voxelXOffset -= VoxelsPerChunk;
 			}
-			voxelYOffset -= voxelResolution;
+			voxelYOffset -= VoxelsPerChunk;
 		}
 	}
 
