@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 [SelectionBase]
-public class VoxelGrid : MonoBehaviour {
+public class VoxelChunk : MonoBehaviour {
 
 	public int chunk_size;
 
@@ -11,7 +11,7 @@ public class VoxelGrid : MonoBehaviour {
 
 	public GameObject voxelPrefab;
 
-	public VoxelGrid xNeighbor, yNeighbor, xyNeighbor;
+	public VoxelChunk xNeighbor, yNeighbor, xyNeighbor;
 
 	private Voxel[] voxels;
 
@@ -47,7 +47,7 @@ public class VoxelGrid : MonoBehaviour {
 		for (int i = 0, y = 0; y < chunk_sz; y++) {
 			for (int x = 0; x < chunk_sz; x++, i++) {
 				voxels[i] = CreateVoxel(x, y);
-				voxels[i].SetVType(RandomVType(basex + x * voxelSize, basey + y * voxelSize));
+				voxels[i].SetVType(RandomVType((basex + x) * voxelSize, (basey + y) * voxelSize));
 				//voxels[i].SetVType((VoxelType)Random.Range (0f, 4f));
 			}
 		}

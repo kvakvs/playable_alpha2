@@ -6,14 +6,17 @@ public class VoxelMap : MonoBehaviour {
 	private static string[] radiusNames = {"0", "1", "2", "3", "4", "5"};
 	private static string[] stencilNames = {"Square", "Circle"};
 
-	public float size = 2f;
+	public float visibleSize = 2f;
 
-	public int VoxelsPerChunk = 8;
-	public int ChunksVisible = 2;
+	public int voxelsPerChunk = 8;
+	public int chunksVisible = 2;
 
-	public VoxelGrid voxelGridPrefab;
+	public VoxelChunk voxelGridPrefab;
 
-	private VoxelGrid[] chunks;
+	//private Voxel[] voxels;
+
+	// Currently visible X x Y chunks
+	private VoxelChunk[] chunks;
 	
 	private float chunkSize, voxelSize, halfSize;
 
@@ -25,23 +28,23 @@ public class VoxelMap : MonoBehaviour {
 	};
 	
 	private void Awake () {
-		halfSize = size * 0.5f;
-		chunkSize = size / ChunksVisible;
-		voxelSize = chunkSize / VoxelsPerChunk;
+		halfSize = visibleSize * 0.5f;
+		chunkSize = visibleSize / chunksVisible;
+		voxelSize = chunkSize / voxelsPerChunk;
 		
-		chunks = new VoxelGrid[ChunksVisible * ChunksVisible];
-		for (int i = 0, y = 0; y < ChunksVisible; y++) {
-			for (int x = 0; x < ChunksVisible; x++, i++) {
+		chunks = new VoxelChunk[chunksVisible * chunksVisible];
+		for (int i = 0, y = 0; y < chunksVisible; y++) {
+			for (int x = 0; x < chunksVisible; x++, i++) {
 				CreateChunk(i, x, y);
 			}
 		}
 		BoxCollider box = gameObject.AddComponent<BoxCollider>();
-		box.size = new Vector3(size, size);
+		box.size = new Vector3(visibleSize, visibleSize);
 	}
 
 	private void CreateChunk (int i, int x, int y) {
-		VoxelGrid chunk = Instantiate(voxelGridPrefab) as VoxelGrid;
-		chunk.Initialize(VoxelsPerChunk, chunkSize, x * VoxelsPerChunk, y * VoxelsPerChunk);
+		VoxelChunk chunk = Instantiate(voxelGridPrefab) as VoxelChunk;
+		chunk.Initialize(voxelsPerChunk, chunkSize, x * voxelsPerChunk, y * voxelsPerChunk);
 		chunk.transform.parent = transform;
 		chunk.transform.localPosition = new Vector3(x * chunkSize - halfSize, y * chunkSize - halfSize);
 		chunks[i] = chunk;
@@ -49,9 +52,9 @@ public class VoxelMap : MonoBehaviour {
 			chunks[i - 1].xNeighbor = chunk;
 		}
 		if (y > 0) {
-			chunks[i - ChunksVisible].yNeighbor = chunk;
+			chunks[i - chunksVisible].yNeighbor = chunk;
 			if (x > 0) {
-				chunks[i - ChunksVisible - 1].xyNeighbor = chunk;
+				chunks[i - chunksVisible - 1].xyNeighbor = chunk;
 			}
 		}
 	}
@@ -71,36 +74,36 @@ public class VoxelMap : MonoBehaviour {
 		int centerX = (int)((point.x + halfSize) / voxelSize);
 		int centerY = (int)((point.y + halfSize) / voxelSize);
 
-		int xStart = (centerX - radiusIndex - 1) / VoxelsPerChunk;
+		int xStart = (centerX - radiusIndex - 1) / voxelsPerChunk;
 		if (xStart < 0) {
 			xStart = 0;
 		}
-		int xEnd = (centerX + radiusIndex) / VoxelsPerChunk;
-		if (xEnd >= ChunksVisible) {
-			xEnd = ChunksVisible - 1;
+		int xEnd = (centerX + radiusIndex) / voxelsPerChunk;
+		if (xEnd >= chunksVisible) {
+			xEnd = chunksVisible - 1;
 		}
-		int yStart = (centerY - radiusIndex - 1) / VoxelsPerChunk;
+		int yStart = (centerY - radiusIndex - 1) / voxelsPerChunk;
 		if (yStart < 0) {
 			yStart = 0;
 		}
-		int yEnd = (centerY + radiusIndex) / VoxelsPerChunk;
-		if (yEnd >= ChunksVisible) {
-			yEnd = ChunksVisible - 1;
+		int yEnd = (centerY + radiusIndex) / voxelsPerChunk;
+		if (yEnd >= chunksVisible) {
+			yEnd = chunksVisible - 1;
 		}
 
 		VoxelStencil activeStencil = stencils[stencilIndex];
 		activeStencil.Initialize((VoxelType)fillTypeIndex, radiusIndex);
 
-		int voxelYOffset = yEnd * VoxelsPerChunk;
+		int voxelYOffset = yEnd * voxelsPerChunk;
 		for (int y = yEnd; y >= yStart; y--) {
-			int i = y * ChunksVisible + xEnd;
-			int voxelXOffset = xEnd * VoxelsPerChunk;
+			int i = y * chunksVisible + xEnd;
+			int voxelXOffset = xEnd * voxelsPerChunk;
 			for (int x = xEnd; x >= xStart; x--, i--) {
 				activeStencil.SetCenter(centerX - voxelXOffset, centerY - voxelYOffset);
 				chunks[i].Apply(activeStencil);
-				voxelXOffset -= VoxelsPerChunk;
+				voxelXOffset -= voxelsPerChunk;
 			}
-			voxelYOffset -= VoxelsPerChunk;
+			voxelYOffset -= voxelsPerChunk;
 		}
 	}
 

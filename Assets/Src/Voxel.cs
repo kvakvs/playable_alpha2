@@ -9,9 +9,9 @@ public enum VoxelType {
 
 [Serializable]
 public class Voxel {
-	static uint[] sprite_col = {0, 14, 0,  14};
-	static uint[] sprite_row = {0, 17, 16, 19};
-	static uint[] num_varieties = {0, 3, 1, 3}; 
+	static uint[] sprite_col    = {0, 13,  0, 13};
+	static uint[] sprite_row    = {0, 17, 16, 19};
+	static uint[] num_varieties = {0,  3,  1,  3}; 
 
 	public VoxelType vtype;
 	public uint      variety;
