@@ -25,11 +25,12 @@ public class VoxelGrid : MonoBehaviour {
 	private Vector2[] vox_uv;
 
 	private Voxel dummyX, dummyY, dummyT;
+	private Noise noise;
 
 	public void Initialize (int resolution, float size) {
 		this.resolution = resolution;
 		gridSize = size;
-		voxelSize = size / resolution;
+		voxelSize = size / (float)resolution;
 		voxels = new Voxel[resolution * resolution];
 		//voxelMaterials = new Material[voxels.Length];
 
@@ -37,9 +38,11 @@ public class VoxelGrid : MonoBehaviour {
 		dummyY = new Voxel();
 		dummyT = new Voxel();
 
+		noise = new Noise(Noise.DEFAULT_SEED);
 		for (int i = 0, y = 0; y < resolution; y++) {
 			for (int x = 0; x < resolution; x++, i++) {
-				CreateVoxel(i, x, y);
+				voxels[i] = CreateVoxel(x, y);
+				voxels[i].SetVType(RandomVType(x * voxelSize, y * voxelSize));
 			}
 		}
 
@@ -54,12 +57,23 @@ public class VoxelGrid : MonoBehaviour {
 		Refresh();	
 	}
 
-	private void CreateVoxel (int i, int x, int y) {
-		GameObject              o = Instantiate(voxelPrefab) as GameObject;
-		o.transform.parent        = transform;
-		o.transform.localPosition = new Vector3(x * voxelSize, y * voxelSize, -0.01f);
-		o.transform.localScale    = Vector3.one * voxelSize * 0.1f;
-		voxels[i]                 = new Voxel(x, y, voxelSize);
+	private Voxel CreateVoxel (int x, int y) {
+		// Create white dots on voxel positions
+		GameObject              white_dot = Instantiate(voxelPrefab) as GameObject;
+		white_dot.transform.parent        = transform;
+		white_dot.transform.localPosition = new Vector3(x * voxelSize, y * voxelSize, -0.01f);
+		white_dot.transform.localScale    = Vector3.one * voxelSize * 0.1f;
+
+		// Create map cell
+		return new Voxel(x, y, voxelSize);
+	}
+
+	private VoxelType RandomVType(float x, float y) {
+		//double vtype_norm = ((noise.eval(x, y) + 1f) / 2f);
+		double vtype_norm = Mathf.PerlinNoise(x, y);
+		int vtype = (int)(vtype_norm * (int)VoxelType.VoxelType_MaxValue);
+		//Debug.Log ("x=" + x + " y=" + y + " vtype=" + vtype + " vtnorm=" + vtype_norm);
+		return (VoxelType)vtype;
 	}
 
 	private void Refresh () {
@@ -283,7 +297,7 @@ public class VoxelGrid : MonoBehaviour {
 		for (int y = yStart; y <= yEnd; y++) {
 			int i = y * resolution + xStart;
 			for (int x = xStart; x <= xEnd; x++, i++) {
-				voxels[i].vtype = stencil.Apply(x, y, voxels[i].vtype);
+				voxels[i].SetVType(stencil.Apply(x, y, voxels[i].vtype));
 			}
 		}
 		Refresh();

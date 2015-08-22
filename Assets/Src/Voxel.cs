@@ -1,21 +1,26 @@
 ﻿using UnityEngine;
 using System;
+using Random = UnityEngine.Random;
 
 public enum VoxelType {
-	Empty, Dirt, Stone, IronOre
+	Empty, Dirt, Stone, IronOre,
+	VoxelType_MaxValue
 };
 
 [Serializable]
 public class Voxel {
-	static int[] sprite_col = {0, 14, 0,  14};
-	static int[] sprite_row = {0, 17, 16, 19};
+	static uint[] sprite_col = {0, 14, 0,  14};
+	static uint[] sprite_row = {0, 17, 16, 19};
+	static uint[] num_varieties = {0, 3, 1, 3}; 
 
 	public VoxelType vtype;
+	public uint      variety;
 
 	public Vector2 position, xEdgePosition, yEdgePosition;
 
 	public Voxel (int x, int y, float size) {
 		vtype = VoxelType.Empty;
+		variety = 0;
 
 		position.x = (x + 0.5f) * size;
 		position.y = (y + 0.5f) * size;
@@ -38,11 +43,16 @@ public class Voxel {
 		return Color.blue;
 	}
 
+	public void SetVType(VoxelType vt) {
+		vtype = vt;
+		variety = (uint)Random.Range(0f, (float)num_varieties[(int)vt]);
+	}
+
 	public void GetUV(Vector2[] uv) {
 		const int spr_cols = 16;
 		const int spr_rows = 22;
-		int spr_col = sprite_col[(int)vtype];
-		int spr_row = sprite_row[(int)vtype];
+		uint spr_col = sprite_col[(uint)vtype] + variety;
+		uint spr_row = sprite_row[(uint)vtype];
 		float u_step = 1f / (spr_cols);
 		float v_step = 1f / (spr_rows);
 		float u = spr_col * u_step;

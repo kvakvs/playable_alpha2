@@ -4,7 +4,6 @@ using System.Collections;
 public class MyCamera : MonoBehaviour {
 	public float mouseSensitivity = 0.01f;
 	private Vector3 lastPosition;
-	//public static Camera main;
 
 	// Use this for initialization
 	void Start () {
@@ -24,6 +23,9 @@ public class MyCamera : MonoBehaviour {
 		{
 			Vector3 delta = lastPosition - Input.mousePosition;
 			transform.Translate(delta.x * mouseSensitivity, delta.y * mouseSensitivity, 0);
+
+			//var ms_world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			//transform.position = new Vector3(ms_world.x, ms_world.y, -10);
 			lastPosition = Input.mousePosition;
 		}
 	}
