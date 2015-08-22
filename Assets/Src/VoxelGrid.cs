@@ -279,13 +279,11 @@ public class VoxelGrid : MonoBehaviour {
 			yEnd = resolution - 1;
 		}
 
-		VoxelType current_vtype = VoxelType.Dirt;
+		//VoxelType current_vtype = VoxelType.Dirt;
 		for (int y = yStart; y <= yEnd; y++) {
 			int i = y * resolution + xStart;
 			for (int x = xStart; x <= xEnd; x++, i++) {
-				if (stencil.Apply(x, y, voxels[i].vtype == current_vtype)) {
-					voxels[i].vtype = current_vtype;
-				}
+				voxels[i].vtype = stencil.Apply(x, y, voxels[i].vtype);
 			}
 		}
 		Refresh();

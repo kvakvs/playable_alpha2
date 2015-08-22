@@ -2,11 +2,13 @@
 using System;
 
 public enum VoxelType {
-	Empty, Dirt, Stone
+	Empty, Dirt, Stone, IronOre
 };
 
 [Serializable]
 public class Voxel {
+	static int[] sprite_col = {0, 14, 0,  14};
+	static int[] sprite_row = {0, 17, 16, 19};
 
 	public VoxelType vtype;
 
@@ -39,8 +41,8 @@ public class Voxel {
 	public void GetUV(Vector2[] uv) {
 		const int spr_cols = 16;
 		const int spr_rows = 22;
-		int spr_col = 14;
-		int spr_row = spr_rows - 1 - 4;
+		int spr_col = sprite_col[(int)vtype];
+		int spr_row = sprite_row[(int)vtype];
 		float u_step = 1f / (spr_cols);
 		float v_step = 1f / (spr_rows);
 		float u = spr_col * u_step;
