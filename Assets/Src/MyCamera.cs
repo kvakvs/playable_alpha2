@@ -16,17 +16,18 @@ public class MyCamera : MonoBehaviour {
 
 		if (Input.GetMouseButtonDown(2))
 		{
-			lastPosition = Input.mousePosition;
+			var ms_pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			transform.position = ms_pos;
+			VoxelMap.instance.cameraPos = ms_pos;
+			//lastPosition = Input.mousePosition;
 		}
 
 		if (Input.GetMouseButton(2))
 		{
-			Vector3 delta = lastPosition - Input.mousePosition;
-			transform.Translate(delta.x * mouseSensitivity, delta.y * mouseSensitivity, 0);
-
-			//var ms_world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			//transform.position = new Vector3(ms_world.x, ms_world.y, -10);
-			lastPosition = Input.mousePosition;
+			//Vector3 delta = lastPosition - Input.mousePosition;
+			//transform.Translate(delta.x * mouseSensitivity, delta.y * mouseSensitivity, 0);
+			//lastPosition = Input.mousePosition;
+			//transform.LookAt(ms_pos);
 		}
 	}
 }

@@ -9,15 +9,9 @@ public class VoxelChunk : MonoBehaviour {
 	// Offset where this chunk starts in the world
 	private int chunk_base_x, chunk_base_y;
 
-	public GameObject voxelPrefab;
-
-	public VoxelChunk xNeighbor, yNeighbor, xyNeighbor;
-
 	private Voxel[] voxels;
 
 	private float voxelSize, gridSize;
-
-	//private Material[] voxelMaterials;
 
 	private Mesh mesh;
 
@@ -25,32 +19,13 @@ public class VoxelChunk : MonoBehaviour {
 	private List<int>     gen_triangles;
 
 	private List<Vector2> gen_uv;
-	private Vector2[] vox_uv;
+	private Vector2[]     vox_uv;
 
-	private Voxel dummyX, dummyY, dummyT;
-	private Noise noise;
-
-	public void Initialize (int chunk_sz, float size, int basex, int basey) {
+	// Takes voxels chunk from big map
+	public void Initialize (int chunk_sz, float size) {
 		this.chunk_size = chunk_sz;
-		this.chunk_base_x = basex;
-		this.chunk_base_y = basey;
 		gridSize = size;
 		voxelSize = size / (float)chunk_sz;
-		voxels = new Voxel[chunk_sz * chunk_sz];
-		//voxelMaterials = new Material[voxels.Length];
-
-		dummyX = new Voxel();
-		dummyY = new Voxel();
-		dummyT = new Voxel();
-
-		//noise = new Noise(Noise.DEFAULT_SEED);
-		for (int i = 0, y = 0; y < chunk_sz; y++) {
-			for (int x = 0; x < chunk_sz; x++, i++) {
-				voxels[i] = CreateVoxel(x, y);
-				voxels[i].SetVType(RandomVType((basex + x) * voxelSize, (basey + y) * voxelSize));
-				//voxels[i].SetVType((VoxelType)Random.Range (0f, 4f));
-			}
-		}
 
 		mesh = new Mesh();
 		mesh.name = "VoxelGrid Mesh";
@@ -61,6 +36,19 @@ public class VoxelChunk : MonoBehaviour {
 		gen_uv        = new List<Vector2>();
 		vox_uv        = new Vector2[4];
 		gen_triangles = new List<int>();
+	}
+
+	// Given new chunk of voxels, reset and rebuild mesh
+	public void UseVoxels(Voxel[] src_voxels, int basex, int basey) {
+		// If this chunk already displays given voxels, do nothing
+		if (this.voxels == src_voxels) {
+			return;
+		}
+
+		this.chunk_base_x = basex;
+		this.chunk_base_y = basey;
+		this.voxels = src_voxels;
+
 		RebuildMesh();	
 	}
 
@@ -71,21 +59,12 @@ public class VoxelChunk : MonoBehaviour {
 		white_dot.transform.parent        = transform;
 		white_dot.transform.localPosition = new Vector3(x * voxelSize, y * voxelSize, -0.01f);
 		white_dot.transform.localScale    = Vector3.one * voxelSize * 0.1f;
-		 */
+		*/
 
 		// Create map cell
 		return new Voxel(x, y, voxelSize);
 	}
 
-	private VoxelType RandomVType(float x, float y) {
-		//double vtype_norm = ((noise.eval(x, y) + 1f) / 2f);
-		double vtype_norm = Mathf.PerlinNoise(x, y);
-		int vtype = (int)(vtype_norm * (int)VoxelType.VoxelType_MaxValue);
-		//Debug.Log ("x=" + x + " y=" + y + " vtype=" + vtype + " vtnorm=" + vtype_norm);
-		return (VoxelType)vtype;
-	}
-
-	
 	private void RebuildMesh () {
 		gen_vertices.Clear();
 		gen_uv.Clear();
