@@ -7,7 +7,7 @@ public class VoxelChunk : MonoBehaviour {
 	public int chunk_size;
 
 	// Offset where this chunk starts in the world
-	private int chunk_base_x, chunk_base_y;
+	//private int chunk_base_x, chunk_base_y;
 
 	private Voxel[] voxels;
 
@@ -45,8 +45,8 @@ public class VoxelChunk : MonoBehaviour {
 			return;
 		}
 
-		this.chunk_base_x = basex;
-		this.chunk_base_y = basey;
+		//this.chunk_base_x = basex;
+		//this.chunk_base_y = basey;
 		this.voxels = src_voxels;
 
 		RebuildMesh();	
