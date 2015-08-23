@@ -133,7 +133,7 @@ public class VoxelChunk : MonoBehaviour {
 	}
 
 	void OnDrawGizmos() {
-		if (!enabled) {
+		if (!enabled || this == null || this.voxels == null) {
 			return;
 		}
 		// Draw a yellow sphere at the transform's position

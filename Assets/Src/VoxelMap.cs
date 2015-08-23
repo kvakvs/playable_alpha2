@@ -15,8 +15,8 @@ public class VoxelMap : MonoBehaviour {
 	const int VOXELS_PER_CHUNK = CHUNK_VOXELS_DIM * CHUNK_VOXELS_DIM;
 
 	// how many chunk blocks are there in map dimensions
-	const int X_CHUNK_COUNT = MAP_WIDTH / VOXELS_PER_CHUNK;
-	const int Y_CHUNK_COUNT = MAP_HEIGHT / VOXELS_PER_CHUNK;
+	const int X_CHUNK_COUNT = MAP_WIDTH / CHUNK_VOXELS_DIM;
+	const int Y_CHUNK_COUNT = MAP_HEIGHT / CHUNK_VOXELS_DIM;
 	const int TOTAL_CHUNKS  = X_CHUNK_COUNT * Y_CHUNK_COUNT;
 
 	public const float CHUNK_SIZE        = VISIBLE_SIZE / VIS_CHUNKS_DIM;
@@ -67,29 +67,30 @@ public class VoxelMap : MonoBehaviour {
 	// Around camera center, create map chunks with mesh
 	private void ShowVisibleChunks() {
 		int xbegin = Clamp ((int)(cameraPos.x / CHUNK_SIZE - VIS_CHUNKS_DIM/2), 
-		                    0, X_CHUNK_COUNT - VIS_CHUNKS_DIM);
+		                    0, X_CHUNK_COUNT - 1);
 		int xend = Clamp (xbegin + VIS_CHUNKS_DIM, 
-		                  0, X_CHUNK_COUNT - VIS_CHUNKS_DIM);
+		                  0, X_CHUNK_COUNT - 1);
 
 		int ybegin = Clamp ((int)(cameraPos.y / CHUNK_SIZE - VIS_CHUNKS_DIM/2), 
-		                    0, Y_CHUNK_COUNT - VIS_CHUNKS_DIM);
+		                    0, Y_CHUNK_COUNT - 1);
 		int yend = Clamp (ybegin + VIS_CHUNKS_DIM, 
-		                  0, Y_CHUNK_COUNT - VIS_CHUNKS_DIM);
+		                  0, Y_CHUNK_COUNT - 1);
 		
 		//Debug.Log ("create vis x=" + xbegin.ToString() + ".." + xend.ToString()
 		//           + "; y=" + ybegin.ToString() + ".." + yend.ToString());
 		int i = 0;
 		for (int y = ybegin; y < yend; y++) {
-			for (int x = xbegin; x < xend; x++, i++) {
+			for (int x = xbegin; x < xend; x++) {
 				var c = visibleChunks[i];
 				c.transform.position = new Vector3(x * CHUNK_SIZE, y * CHUNK_SIZE);
 				c.UseVoxels(voxels[y * X_CHUNK_COUNT + x]);
 				c.enabled = true;
+				i++;
 			}
 		}
-		for (; i < VIS_CHUNKS_DIM * VIS_CHUNKS_DIM; i++) {
-			visibleChunks[i].enabled = false;
-		}
+		//for (; i < VIS_CHUNKS_DIM * VIS_CHUNKS_DIM; i++) {
+		//	visibleChunks[i].enabled = false;
+		//}
 	}
 	
 	private void Awake () {

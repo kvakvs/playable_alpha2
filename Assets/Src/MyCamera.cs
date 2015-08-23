@@ -8,27 +8,19 @@ public class MyCamera : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		//main = this;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		//Camera.main.ScreenToWorldPoint(Input.mousePosition) 
-
 		if (Input.GetMouseButtonDown(2))
 		{
-			var ms_pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			transform.position = new Vector3(ms_pos.x, ms_pos.y, CAMERA_Z);
-			VoxelMap.instance.OnCameraPosChanged();
-			//lastPosition = Input.mousePosition;
 		}
 
 		if (Input.GetMouseButton(2))
 		{
-			//Vector3 delta = lastPosition - Input.mousePosition;
-			//transform.Translate(delta.x * mouseSensitivity, delta.y * mouseSensitivity, 0);
-			//lastPosition = Input.mousePosition;
-			//transform.LookAt(ms_pos);
+			var ms_pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			transform.position = new Vector3(ms_pos.x, ms_pos.y, CAMERA_Z);
+			VoxelMap.instance.OnCameraPosChanged();
 		}
 	}
 }
