@@ -6,8 +6,6 @@ public class VoxelMap : MonoBehaviour {
 	private static string[] radiusNames = {"0", "1", "2", "3", "4", "5"};
 	private static string[] stencilNames = {"Square", "Circle"};
 
-	const float VISIBLE_SIZE = 3f; // fits VIS_CHUNKS_DIM, each CHUNK_VOXELS_DIM voxels
-
 	const int MAP_WIDTH  = 1024;
 	const int MAP_HEIGHT = 512;
 	public const int CHUNK_VOXELS_DIM = 16;
@@ -19,8 +17,9 @@ public class VoxelMap : MonoBehaviour {
 	const int Y_CHUNK_COUNT = MAP_HEIGHT / CHUNK_VOXELS_DIM;
 	const int TOTAL_CHUNKS  = X_CHUNK_COUNT * Y_CHUNK_COUNT;
 
-	public const float CHUNK_SIZE        = VISIBLE_SIZE / VIS_CHUNKS_DIM;
-	public const float VOXEL_SIZE = CHUNK_SIZE / CHUNK_VOXELS_DIM;
+	public const float VOXEL_SIZE   = 0.075f; //CHUNK_SIZE / CHUNK_VOXELS_DIM;
+	public const float CHUNK_SIZE   = CHUNK_VOXELS_DIM * VOXEL_SIZE; //VISIBLE_SIZE / VIS_CHUNKS_DIM;
+	const        float VISIBLE_SIZE = CHUNK_SIZE * VIS_CHUNKS_DIM;
 
 	public VoxelChunk voxelGridPrefab;
 
@@ -116,24 +115,42 @@ public class VoxelMap : MonoBehaviour {
 
 	// Fills a square of voxels 
 	private void InitChunkTerrain(Voxel[] vv, int basex, int basey) {
-		float x_offs = basex * VOXEL_SIZE;
-		float y_offs = basey * VOXEL_SIZE;
+		float x_offs1 = basex * VOXEL_SIZE;
+		float y_offs1 = basey * VOXEL_SIZE;
+		float x_offs2 = x_offs1 + MAP_WIDTH * VOXEL_SIZE;
+		float y_offs2 = y_offs1 + MAP_HEIGHT * VOXEL_SIZE;
+		// more density for ore
+		float x_offs_ore = x_offs1 * 0.6f + 2 * MAP_WIDTH * VOXEL_SIZE;
+		float y_offs_ore = y_offs1 * 0.6f + 2 * MAP_HEIGHT * VOXEL_SIZE;
+
+		// Init stone wavy pattern, place void pattern over it
 		for (int i = 0, y = 0; y < CHUNK_VOXELS_DIM; y++) {
 			for (int x = 0; x < CHUNK_VOXELS_DIM; x++, i++) {
 				vv[i] = new Voxel(x, y);
-				vv[i].vtype = GenerateRandomVType(x_offs + vv[i].position.x, y_offs + vv[i].position.y);
-				//vv[i].SetVType((VoxelType)Random.Range (0f, 4f));
+				var vt = GenerateRandomStoneDirt(x_offs1 + vv[i].position.x, y_offs1 + vv[i].position.y);
+				vt = GenerateRandomOre(vt, x_offs_ore + vv[i].position.x, y_offs_ore + vv[i].position.y);
+				if (vt != VoxelType.Empty) {
+					vt = GenerateRandomVoid(vt, x_offs2 + vv[i].position.x, y_offs2 + vv[i].position.y);
+				}
+				vv[i].vtype = vt;
 			}
 		}
 	}
 
-	private VoxelType GenerateRandomVType(float x, float y) {
-		//double vtype_norm = ((noise.eval(x, y) + 1f) / 2f);
-		double vtype_norm = Mathf.PerlinNoise(x, y);
-		int vtype = ClampUpper ((int)(vtype_norm * (int)VoxelType.VoxelType_MaxValue),
-		                        (int)VoxelType.VoxelType_MaxValue - 1);
-		//Debug.Log ("x=" + x + " y=" + y + " vtype=" + vtype + " vtnorm=" + vtype_norm);
-		return (VoxelType)vtype;
+	private VoxelType GenerateRandomStoneDirt(float x, float y) {
+		double rnd = Mathf.Min (Mathf.PerlinNoise(x, y), 1f);
+		if (rnd < 0.7f) { return VoxelType.Dirt; }
+		return VoxelType.Stone;
+	}
+	private VoxelType GenerateRandomOre(VoxelType vt, float x, float y) {
+		double rnd = Mathf.Min (Mathf.PerlinNoise(x, y), 1f);
+		if (rnd < 0.15f) { return VoxelType.IronOre; }
+		return vt; // else do not change
+	}
+	private VoxelType GenerateRandomVoid(VoxelType vt, float x, float y) {
+		double rnd = Mathf.Min (Mathf.PerlinNoise(x, y), 1f);
+		if (rnd < 0.25f) { return VoxelType.Empty; }
+		return vt; // else do not change
 	}
 
 	private void CreateChunk (int i) {
