@@ -13,40 +13,32 @@ public class Voxel {
 	static uint[] sprite_row    = {0, 17, 16, 19};
 	static uint[] num_varieties = {0,  3,  1,  3}; 
 
-	public VoxelType vtype;
+	private VoxelType m_vtype;
+	public VoxelType vtype {
+		set { 
+			m_vtype = value; 
+			variety = (uint)Random.Range(0f, (float)num_varieties[(int)value]);
+		}
+		get { return m_vtype; }
+	}
 	public uint      variety;
 
-	public Vector2 tl;
-	public Vector2 br;
+	public Vector2 position; // Bottom-left (origin)
+	public Vector2 opposite; // Top-right (opposite origin)
 
-	public Voxel (int x, int y, float size) {
+	const float VOXEL_SIZE = VoxelMap.VOXEL_SIZE;
+
+	public Voxel (int x, int y) {
 		vtype = VoxelType.Empty;
 		variety = 0;
 
-		tl.x = x * size;
-		tl.y = y * size;
+		position.x = x * VOXEL_SIZE;
+		position.y = y * VOXEL_SIZE;
 
-		br = tl;
-		br.x += size;
-		br.y += size;
+		opposite = new Vector2(position.x + VOXEL_SIZE, position.y + VOXEL_SIZE);
 	}
 
 	public Voxel () {}
-
-	public Color GetColor() {
-		// optimizeme
-		switch (vtype) {
-		case VoxelType.Empty: return Color.black;
-		case VoxelType.Dirt: return Color.Lerp (Color.yellow, Color.black, 0.5f); // optimizeme
-		case VoxelType.Stone: return Color.gray;
-		}
-		return Color.blue;
-	}
-
-	public void SetVType(VoxelType vt) {
-		vtype = vt;
-		variety = (uint)Random.Range(0f, (float)num_varieties[(int)vt]);
-	}
 
 	public void GetUV(Vector2[] uv) {
 		const int spr_cols = 16;

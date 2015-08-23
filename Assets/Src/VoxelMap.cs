@@ -6,20 +6,21 @@ public class VoxelMap : MonoBehaviour {
 	private static string[] radiusNames = {"0", "1", "2", "3", "4", "5"};
 	private static string[] stencilNames = {"Square", "Circle"};
 
-	const float VISIBLE_SIZE = 2f; // fits VIS_CHUNKS_DIM, each CHUNK_VOXELS_DIM voxels
+	const float VISIBLE_SIZE = 3f; // fits VIS_CHUNKS_DIM, each CHUNK_VOXELS_DIM voxels
 
-	const int MAP_WIDTH = 1024;
+	const int MAP_WIDTH  = 1024;
 	const int MAP_HEIGHT = 512;
-	const int CHUNK_VOXELS_DIM = 8;
-	const int VIS_CHUNKS_DIM = 3;
+	public const int CHUNK_VOXELS_DIM = 16;
+	const int VIS_CHUNKS_DIM   = 3;
 	const int VOXELS_PER_CHUNK = CHUNK_VOXELS_DIM * CHUNK_VOXELS_DIM;
+
 	// how many chunk blocks are there in map dimensions
 	const int X_CHUNK_COUNT = MAP_WIDTH / VOXELS_PER_CHUNK;
 	const int Y_CHUNK_COUNT = MAP_HEIGHT / VOXELS_PER_CHUNK;
-	const int TOTAL_CHUNKS = X_CHUNK_COUNT * Y_CHUNK_COUNT;
-	//const float HALF_SIZE = VISIBLE_SIZE * 0.5f;
-	const float CHUNK_SIZE = VISIBLE_SIZE / VIS_CHUNKS_DIM;
-	const float VOXEL_SIZE = CHUNK_SIZE / CHUNK_VOXELS_DIM;
+	const int TOTAL_CHUNKS  = X_CHUNK_COUNT * Y_CHUNK_COUNT;
+
+	public const float CHUNK_SIZE        = VISIBLE_SIZE / VIS_CHUNKS_DIM;
+	public const float VOXEL_SIZE = CHUNK_SIZE / CHUNK_VOXELS_DIM;
 
 	public VoxelChunk voxelGridPrefab;
 
@@ -38,44 +39,56 @@ public class VoxelMap : MonoBehaviour {
 		new VoxelStencilCircle()
 	};
 
-	private Vector2 m_camera_pos;
+	//private Vector2 m_camera_pos;
 	public Vector2 cameraPos {
-		get { return m_camera_pos; }
-		set { m_camera_pos = value; OnCameraPosChanged(value); }
+		get { return Camera.main.transform.position; }
+		set { 
+			Camera.main.transform.position = value; 
+			OnCameraPosChanged(); 
+		}
 	}
 
-	private void OnCameraPosChanged(Vector2 pos) {
+	public void OnCameraPosChanged() {
 		//Camera.main.transform.position = new Vector3(pos.x, pos.y, -10); 
 		//Camera.main.transform.LookAt(new Vector3(pos.x, pos.y, 0)); 
-		CreateVisibleChunks();
+		ShowVisibleChunks();
 	}
 
-	static int ClampLower( int value, int min )
-	{
+	static int ClampLower( int value, int min ) {
 		return (value < min) ? min : value;
 	}
-
-	static int ClampUpper( int value, int max )
-	{
+	static int ClampUpper( int value, int max ) {
 		return (value > max) ? max : value;
+	}
+	static int Clamp( int value, int min, int max ) {
+		return (value > max) ? max : ((value < min) ? min : value);
 	}
 
 	// Around camera center, create map chunks with mesh
-	private void CreateVisibleChunks() {
-		int xbegin = ClampLower ((int)(cameraPos.x / CHUNK_SIZE), 0);
-		int xend = ClampUpper (xbegin + VIS_CHUNKS_DIM, X_CHUNK_COUNT - 1);
+	private void ShowVisibleChunks() {
+		int xbegin = Clamp ((int)(cameraPos.x / CHUNK_SIZE - VIS_CHUNKS_DIM/2), 
+		                    0, X_CHUNK_COUNT - VIS_CHUNKS_DIM);
+		int xend = Clamp (xbegin + VIS_CHUNKS_DIM, 
+		                  0, X_CHUNK_COUNT - VIS_CHUNKS_DIM);
 
-		int ybegin = ClampLower ((int)(cameraPos.y / CHUNK_SIZE), 0);
-		int yend = ClampUpper (ybegin + VIS_CHUNKS_DIM, Y_CHUNK_COUNT - 1);
+		int ybegin = Clamp ((int)(cameraPos.y / CHUNK_SIZE - VIS_CHUNKS_DIM/2), 
+		                    0, Y_CHUNK_COUNT - VIS_CHUNKS_DIM);
+		int yend = Clamp (ybegin + VIS_CHUNKS_DIM, 
+		                  0, Y_CHUNK_COUNT - VIS_CHUNKS_DIM);
 		
-//		Debug.Log ("create vis x=" + xbegin.ToString() + ".." + xend.ToString()
-//		           + "; y=" + ybegin.ToString() + ".." + yend.ToString());
-		for (int i = 0, y = ybegin; y < yend; y++) {
+		//Debug.Log ("create vis x=" + xbegin.ToString() + ".." + xend.ToString()
+		//           + "; y=" + ybegin.ToString() + ".." + yend.ToString());
+		int i = 0;
+		for (int y = ybegin; y < yend; y++) {
 			for (int x = xbegin; x < xend; x++, i++) {
 				var c = visibleChunks[i];
-				c.transform.localPosition = new Vector3(x * CHUNK_SIZE, y * CHUNK_SIZE);
-				c.UseVoxels(voxels[y * X_CHUNK_COUNT + x], x, y);
+				c.transform.position = new Vector3(x * CHUNK_SIZE, y * CHUNK_SIZE);
+				c.UseVoxels(voxels[y * X_CHUNK_COUNT + x]);
+				c.enabled = true;
 			}
+		}
+		for (; i < VIS_CHUNKS_DIM * VIS_CHUNKS_DIM; i++) {
+			visibleChunks[i].enabled = false;
 		}
 	}
 	
@@ -102,12 +115,12 @@ public class VoxelMap : MonoBehaviour {
 
 	// Fills a square of voxels 
 	private void InitChunkTerrain(Voxel[] vv, int basex, int basey) {
-		float x_offs = basex * CHUNK_SIZE;
-		float y_offs = basey * CHUNK_SIZE;
+		float x_offs = basex * VOXEL_SIZE;
+		float y_offs = basey * VOXEL_SIZE;
 		for (int i = 0, y = 0; y < CHUNK_VOXELS_DIM; y++) {
 			for (int x = 0; x < CHUNK_VOXELS_DIM; x++, i++) {
-				vv[i] = new Voxel(x, y, VOXEL_SIZE);
-				vv[i].SetVType(GenerateRandomVType(x_offs + vv[i].tl.x, y_offs + vv[i].tl.y));
+				vv[i] = new Voxel(x, y);
+				vv[i].vtype = GenerateRandomVType(x_offs + vv[i].position.x, y_offs + vv[i].position.y);
 				//vv[i].SetVType((VoxelType)Random.Range (0f, 4f));
 			}
 		}
@@ -124,7 +137,7 @@ public class VoxelMap : MonoBehaviour {
 
 	private void CreateChunk (int i) {
 		VoxelChunk chunk = Instantiate(voxelGridPrefab) as VoxelChunk;
-		chunk.Initialize(CHUNK_VOXELS_DIM, CHUNK_SIZE);
+		chunk.Initialize();
 		chunk.transform.parent = transform;
 		visibleChunks[i] = chunk;
 	}
