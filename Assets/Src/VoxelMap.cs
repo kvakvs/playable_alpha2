@@ -209,6 +209,7 @@ public class VoxelMap : MonoBehaviour {
 	}
 
 	private void OnGUI () {
+		/*
 		GUILayout.BeginArea(new Rect(4f, 4f, 200f, 500f));
 		GUILayout.Label("Fill Type");
 		fillTypeIndex = GUILayout.SelectionGrid(fillTypeIndex, fillTypeNames, 4);
@@ -217,5 +218,6 @@ public class VoxelMap : MonoBehaviour {
 		GUILayout.Label("Stencil");
 		stencilIndex = GUILayout.SelectionGrid(stencilIndex, stencilNames, 2);
 		GUILayout.EndArea();
+		*/
 	}
 }
