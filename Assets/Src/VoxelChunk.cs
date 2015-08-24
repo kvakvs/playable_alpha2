@@ -43,6 +43,10 @@ public class VoxelChunk : MonoBehaviour {
 		RebuildMesh();	
 	}
 
+	public bool IsUsingVoxels(Voxel[] v) {
+		return this.voxels == v;
+	}
+
 	private void RebuildMesh () {
 		gen_vertices.Clear();
 		gen_uv.Clear();

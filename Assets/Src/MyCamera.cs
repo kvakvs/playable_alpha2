@@ -8,8 +8,12 @@ public class MyCamera : MonoBehaviour {
 	const float CAMERA_Z = -10;
 	const float CAMERA_SCROLL_SPEED = 0.04f;
 
+	const float MAP_WIDTH = VoxelMap.MAP_WIDTH;
+	const float MAP_HEIGHT = VoxelMap.MAP_HEIGHT;
+
 	// Use this for initialization
 	void Start () {
+		transform.position = new Vector3(MAP_WIDTH / 2, MAP_HEIGHT);
 	}
 	
 	// Update is called once per frame

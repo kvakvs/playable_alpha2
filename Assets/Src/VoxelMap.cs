@@ -6,15 +6,18 @@ public class VoxelMap : MonoBehaviour {
 	private static string[] radiusNames = {"0", "1", "2", "3", "4", "5"};
 	private static string[] stencilNames = {"Square", "Circle"};
 
-	const int MAP_WIDTH  = 1024;
-	const int MAP_HEIGHT = 512;
+	const int MAP_NUM_COLS  = 1024;
+	const int MAP_NUM_ROWS = 512;
+	public const float MAP_WIDTH = MAP_NUM_COLS * VOXEL_SIZE - CHUNK_SIZE;
+	public const float MAP_HEIGHT = MAP_NUM_ROWS * VOXEL_SIZE - CHUNK_SIZE;
+
 	public const int CHUNK_VOXELS_DIM = 16;
 	const int VIS_CHUNKS_DIM   = 3;
 	const int VOXELS_PER_CHUNK = CHUNK_VOXELS_DIM * CHUNK_VOXELS_DIM;
 
 	// how many chunk blocks are there in map dimensions
-	const int X_CHUNK_COUNT = MAP_WIDTH / CHUNK_VOXELS_DIM;
-	const int Y_CHUNK_COUNT = MAP_HEIGHT / CHUNK_VOXELS_DIM;
+	const int X_CHUNK_COUNT = MAP_NUM_COLS / CHUNK_VOXELS_DIM;
+	const int Y_CHUNK_COUNT = MAP_NUM_ROWS / CHUNK_VOXELS_DIM;
 	const int TOTAL_CHUNKS  = X_CHUNK_COUNT * Y_CHUNK_COUNT;
 
 	public const float VOXEL_SIZE   = 0.075f; //CHUNK_SIZE / CHUNK_VOXELS_DIM;
@@ -80,16 +83,33 @@ public class VoxelMap : MonoBehaviour {
 		int i = 0;
 		for (int y = ybegin; y < yend; y++) {
 			for (int x = xbegin; x < xend; x++) {
-				var c = visibleChunks[i];
+				// Find in the remaining chunks if any of them uses voxels we plan to use
+				var vox = voxels[y * X_CHUNK_COUNT + x];
+				int j = VIS_CHUNKS_DIM * VIS_CHUNKS_DIM - 1;
+				while (j > i) {
+					// If found one chunk who uses this mesh, just swap it into this position
+					if (visibleChunks[j].IsUsingVoxels(vox)) {
+						if (i != j) { Swap(ref visibleChunks[i], ref visibleChunks[j]); }
+						break;
+					}
+					j--;
+				}
+				var c = visibleChunks[j];
 				c.transform.position = new Vector3(x * CHUNK_SIZE, y * CHUNK_SIZE);
-				c.UseVoxels(voxels[y * X_CHUNK_COUNT + x]);
+				c.UseVoxels(vox);
 				c.enabled = true;
 				i++;
 			}
 		}
-		//for (; i < VIS_CHUNKS_DIM * VIS_CHUNKS_DIM; i++) {
-		//	visibleChunks[i].enabled = false;
-		//}
+		for (; i < VIS_CHUNKS_DIM * VIS_CHUNKS_DIM; i++) {
+			visibleChunks[i].enabled = false;
+		}
+	}
+
+	public static void Swap<T> (ref T lhs, ref T rhs) {
+		T temp = lhs;
+		lhs = rhs;
+		rhs = temp;
 	}
 	
 	private void Awake () {
@@ -117,11 +137,11 @@ public class VoxelMap : MonoBehaviour {
 	private void InitChunkTerrain(Voxel[] vv, int basex, int basey) {
 		float x_offs1 = basex * VOXEL_SIZE;
 		float y_offs1 = basey * VOXEL_SIZE;
-		float x_offs2 = x_offs1 + MAP_WIDTH * VOXEL_SIZE;
-		float y_offs2 = y_offs1 + MAP_HEIGHT * VOXEL_SIZE;
+		float x_offs2 = x_offs1 + MAP_NUM_COLS * VOXEL_SIZE;
+		float y_offs2 = y_offs1 + MAP_NUM_ROWS * VOXEL_SIZE;
 		// more density for ore
-		float x_offs_ore = x_offs1 * 0.6f + 2 * MAP_WIDTH * VOXEL_SIZE;
-		float y_offs_ore = y_offs1 * 0.6f + 2 * MAP_HEIGHT * VOXEL_SIZE;
+		float x_offs_ore = x_offs1 * 0.6f + 2 * MAP_NUM_COLS * VOXEL_SIZE;
+		float y_offs_ore = y_offs1 * 0.6f + 2 * MAP_NUM_ROWS * VOXEL_SIZE;
 
 		// Init stone wavy pattern, place void pattern over it
 		for (int i = 0, y = 0; y < CHUNK_VOXELS_DIM; y++) {
