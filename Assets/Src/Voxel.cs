@@ -40,6 +40,10 @@ public class Voxel {
 
 	public Voxel () {}
 
+	public bool IsSolid() {
+		return m_vtype != VoxelType.Empty;
+	}
+
 	public void GetUV(Vector2[] uv) {
 		const int spr_cols = 16;
 		const int spr_rows = 22;

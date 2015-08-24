@@ -96,7 +96,7 @@ public class VoxelMap : MonoBehaviour {
 				}
 				var c = visibleChunks[j];
 				c.transform.position = new Vector3(x * CHUNK_SIZE, y * CHUNK_SIZE);
-				c.UseVoxels(vox);
+				c.UseVoxels(vox, x, y);
 				c.enabled = true;
 				i++;
 			}

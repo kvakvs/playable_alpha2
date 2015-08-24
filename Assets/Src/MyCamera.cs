@@ -14,6 +14,9 @@ public class MyCamera : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		transform.position = new Vector3(MAP_WIDTH / 2, MAP_HEIGHT);
+		var pl = GameObject.Find ("Player");
+		pl.transform.position = transform.position + new Vector3(-5f * VoxelMap.VOXEL_SIZE, 2f, 0);
+		VoxelMap.instance.OnCameraPosChanged();
 	}
 	
 	// Update is called once per frame
