@@ -171,7 +171,14 @@ public class TerrainChunk : MonoBehaviour {
 	}
 
 	public void Edit (int x, int y) {
-		voxels[x + y * CHUNK_VOXELS_DIM].vtype = VoxelType.Empty;
-		RebuildMesh();
+		var newVT = VoxelType.Empty;
+		int voxIndex = x + y * CHUNK_VOXELS_DIM;
+		if (voxIndex < 0 || voxIndex >= CHUNK_VOXELS_DIM * CHUNK_VOXELS_DIM) {
+			return; 
+		}
+		if (voxels[voxIndex].vtype != newVT) {
+			voxels[voxIndex].vtype = newVT;
+			RebuildMesh();
+		}
 	}
 }

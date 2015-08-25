@@ -22,7 +22,7 @@ public class PlayerCtl : MonoBehaviour {
 
 		// BUG BUG: When player is out of screen, colliders are deleted and player falls
 
-		if (Input.GetMouseButtonDown(0)) {
+		if (Input.GetMouseButton /*Down*/(0)) {
 			//RaycastHit hitInfo;
 			Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			Terrain.instance.EditVoxels(p);

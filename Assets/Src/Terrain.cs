@@ -7,12 +7,12 @@ public class Terrain : MonoBehaviour {
 	private static string[] stencilNames = {"Square", "Circle"};
 
 	const int MAP_NUM_COLS  = 1024;
-	const int MAP_NUM_ROWS = 512;
+	const int MAP_NUM_ROWS  = 512;
 	public const float MAP_WIDTH = MAP_NUM_COLS * VOXEL_SIZE - CHUNK_SIZE;
 	public const float MAP_HEIGHT = MAP_NUM_ROWS * VOXEL_SIZE - CHUNK_SIZE;
 
-	public const int CHUNK_VOXELS_DIM = 16;
-	const int VIS_CHUNKS_DIM   = 3;
+	public const int CHUNK_VOXELS_DIM = 8;
+	const int VIS_CHUNKS_DIM  = 5;
 	const int VIS_CHUNKS = VIS_CHUNKS_DIM * VIS_CHUNKS_DIM;
 	const int VOXELS_PER_CHUNK = CHUNK_VOXELS_DIM * CHUNK_VOXELS_DIM;
 
@@ -194,9 +194,13 @@ public class Terrain : MonoBehaviour {
 
 		int chunkX = clickX / CHUNK_VOXELS_DIM;
 		int chunkY = clickY / CHUNK_VOXELS_DIM;
-		Debug.Log("clickX=" + clickX + " chunkX=" + chunkX);
+		//Debug.Log("clickX=" + clickX + " chunkX=" + chunkX);
 
-		var vox = voxels[chunkY * X_CHUNK_COUNT + chunkX];
+		int voxIndex = chunkY * X_CHUNK_COUNT + chunkX;
+		if (voxIndex < 0 || voxIndex >= TOTAL_CHUNKS) {
+			return; 
+		}
+		var vox = voxels[voxIndex];
 		for (int i = 0; i < VIS_CHUNKS; i++) {
 			if (visibleChunks[i].IsUsingVoxels(vox)) {
 				visibleChunks[i].Edit(clickX % CHUNK_VOXELS_DIM, clickY % CHUNK_VOXELS_DIM);
