@@ -13,6 +13,7 @@ public class Terrain : MonoBehaviour {
 
 	public const int CHUNK_VOXELS_DIM = 16;
 	const int VIS_CHUNKS_DIM   = 3;
+	const int VIS_CHUNKS = VIS_CHUNKS_DIM * VIS_CHUNKS_DIM;
 	const int VOXELS_PER_CHUNK = CHUNK_VOXELS_DIM * CHUNK_VOXELS_DIM;
 
 	// how many chunk blocks are there in map dimensions
@@ -24,24 +25,23 @@ public class Terrain : MonoBehaviour {
 	public const float CHUNK_SIZE   = CHUNK_VOXELS_DIM * VOXEL_SIZE; //VISIBLE_SIZE / VIS_CHUNKS_DIM;
 	const        float VISIBLE_SIZE = CHUNK_SIZE * VIS_CHUNKS_DIM;
 
-	public VoxelChunk voxelGridPrefab;
+	public TerrainChunk voxelGridPrefab;
 
 	// Two-dimensional array of whole world, split into chunks
 
 	private Voxel[][] voxels;
 
 	// Currently visible X x Y chunks
-	private VoxelChunk[] visibleChunks;
+	private TerrainChunk[] visibleChunks;
 	
-	private int fillTypeIndex, radiusIndex, stencilIndex;
+	//private int fillTypeIndex, radiusIndex, stencilIndex;
 	public static Terrain instance;
 
-	private VoxelStencil[] stencils = {
-		new VoxelStencil(),
-		new VoxelStencilCircle()
-	};
-
-	//private Vector2 m_camera_pos;
+	//private VoxelStencil[] stencils = {
+	//	new VoxelStencil(),
+	//	new VoxelStencilCircle()
+	//};
+	
 	public Vector2 cameraPos {
 		get { return Camera.main.transform.position; }
 		set { 
@@ -85,7 +85,7 @@ public class Terrain : MonoBehaviour {
 			for (int x = xbegin; x < xend; x++) {
 				// Find in the remaining chunks if any of them uses voxels we plan to use
 				var vox = voxels[y * X_CHUNK_COUNT + x];
-				int j = VIS_CHUNKS_DIM * VIS_CHUNKS_DIM - 1;
+				int j = VIS_CHUNKS - 1;
 				while (j > i) {
 					// If found one chunk who uses this mesh, just swap it into this position
 					if (visibleChunks[j].IsUsingVoxels(vox)) {
@@ -101,7 +101,7 @@ public class Terrain : MonoBehaviour {
 				i++;
 			}
 		}
-		for (; i < VIS_CHUNKS_DIM * VIS_CHUNKS_DIM; i++) {
+		for (; i < VIS_CHUNKS; i++) {
 			visibleChunks[i].enabled = false;
 		}
 	}
@@ -123,8 +123,8 @@ public class Terrain : MonoBehaviour {
 			}
 		}
 
-		visibleChunks = new VoxelChunk[VIS_CHUNKS_DIM * VIS_CHUNKS_DIM];
-		for (int i = 0; i < VIS_CHUNKS_DIM * VIS_CHUNKS_DIM; i++) {
+		visibleChunks = new TerrainChunk[VIS_CHUNKS];
+		for (int i = 0; i < VIS_CHUNKS; i++) {
 			CreateChunk(i);
 		}
 		cameraPos = new Vector2(0f, 0f);
@@ -174,47 +174,37 @@ public class Terrain : MonoBehaviour {
 	}
 
 	private void CreateChunk (int i) {
-		VoxelChunk chunk = Instantiate(voxelGridPrefab) as VoxelChunk;
+		TerrainChunk chunk = Instantiate(voxelGridPrefab) as TerrainChunk;
 		chunk.Initialize();
 		chunk.transform.parent = transform;
 		visibleChunks[i] = chunk;
 	}
 
 	private void Update () {
-		if (Input.GetMouseButton(0)) {
-			RaycastHit hitInfo;
-			if(Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo)) {
-				if (hitInfo.collider.gameObject == gameObject) {
-					EditVoxels(transform.InverseTransformPoint(hitInfo.point));
-				}
-			}
+		if (Input.GetMouseButtonDown(0)) {
+			//RaycastHit hitInfo;
+			Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			EditVoxels(p);
 		}
 	}
 
 	private void EditVoxels (Vector3 point) {
-		int centerX = (int)(point.x / VOXEL_SIZE);
-		int centerY = (int)(point.y / VOXEL_SIZE);
+		int clickX = (int)(point.x / VOXEL_SIZE);
+		int clickY = (int)(point.y / VOXEL_SIZE);
 
-		int xStart = (centerX - radiusIndex - 1) / CHUNK_VOXELS_DIM;
-		if (xStart < 0) {
-			xStart = 0;
-		}
-		int xEnd = (centerX + radiusIndex) / CHUNK_VOXELS_DIM;
-		if (xEnd >= VIS_CHUNKS_DIM) {
-			xEnd = VIS_CHUNKS_DIM - 1;
-		}
-		int yStart = (centerY - radiusIndex - 1) / CHUNK_VOXELS_DIM;
-		if (yStart < 0) {
-			yStart = 0;
-		}
-		int yEnd = (centerY + radiusIndex) / CHUNK_VOXELS_DIM;
-		if (yEnd >= VIS_CHUNKS_DIM) {
-			yEnd = VIS_CHUNKS_DIM - 1;
+		int chunkX = clickX / CHUNK_VOXELS_DIM;
+		int chunkY = clickY / CHUNK_VOXELS_DIM;
+		Debug.Log("clickX=" + clickX + " chunkX=" + chunkX);
+
+		var vox = voxels[chunkY * X_CHUNK_COUNT + chunkX];
+		for (int i = 0; i < VIS_CHUNKS; i++) {
+			if (visibleChunks[i].IsUsingVoxels(vox)) {
+				visibleChunks[i].Edit(clickX % CHUNK_VOXELS_DIM, clickY % CHUNK_VOXELS_DIM);
+				return;
+			}
 		}
 
-		VoxelStencil activeStencil = stencils[stencilIndex];
-		activeStencil.Initialize((VoxelType)fillTypeIndex, radiusIndex);
-
+		/*
 		int voxelYOffset = yEnd * CHUNK_VOXELS_DIM;
 		for (int y = yEnd; y >= yStart; y--) {
 			int i = y * VIS_CHUNKS_DIM + xEnd;
@@ -226,6 +216,7 @@ public class Terrain : MonoBehaviour {
 			}
 			voxelYOffset -= CHUNK_VOXELS_DIM;
 		}
+		*/
 	}
 
 	private void OnGUI () {

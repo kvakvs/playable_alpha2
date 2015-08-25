@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 [SelectionBase]
-public class VoxelChunk : MonoBehaviour {
+public class TerrainChunk : MonoBehaviour {
 	const int CHUNK_VOXELS_DIM = Terrain.CHUNK_VOXELS_DIM;
 	const float CHUNK_SIZE = Terrain.CHUNK_SIZE;
 	const float VOXEL_SIZE = Terrain.VOXEL_SIZE;
@@ -68,9 +68,9 @@ public class VoxelChunk : MonoBehaviour {
 		mesh.RecalculateNormals();
 		GetComponent<MeshFilter>().mesh = mesh;
 
-		//gen_vertices.Clear();
-		//gen_uv.Clear();
-		//gen_triangles.Clear();
+		gen_vertices.Clear();
+		gen_uv.Clear();
+		gen_triangles.Clear();
 	}
 
 	void RebuildColliders ()
@@ -170,31 +170,8 @@ public class VoxelChunk : MonoBehaviour {
 		gen_triangles.Add(vertexIndex + 1);
 	}
 
-	public void Apply (VoxelStencil stencil) {
-		int xStart = stencil.XStart;
-		if (xStart < 0) {
-			xStart = 0;
-		}
-		int xEnd = stencil.XEnd;
-		if (xEnd >= CHUNK_VOXELS_DIM) {
-			xEnd = CHUNK_VOXELS_DIM - 1;
-		}
-		int yStart = stencil.YStart;
-		if (yStart < 0) {
-			yStart = 0;
-		}
-		int yEnd = stencil.YEnd;
-		if (yEnd >= CHUNK_VOXELS_DIM) {
-			yEnd = CHUNK_VOXELS_DIM - 1;
-		}
-
-		//VoxelType current_vtype = VoxelType.Dirt;
-		for (int y = yStart; y <= yEnd; y++) {
-			int i = y * CHUNK_VOXELS_DIM + xStart;
-			for (int x = xStart; x <= xEnd; x++, i++) {
-				voxels[i].vtype = stencil.Apply(x, y, voxels[i].vtype);
-			}
-		}
+	public void Edit (int x, int y) {
+		voxels[x + y * CHUNK_VOXELS_DIM].vtype = VoxelType.Empty;
 		RebuildMesh();
 	}
 
