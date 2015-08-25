@@ -180,15 +180,15 @@ public class Terrain : MonoBehaviour {
 		visibleChunks[i] = chunk;
 	}
 
-	private void Update () {
+/*	private void Update () {
 		if (Input.GetMouseButtonDown(0)) {
 			//RaycastHit hitInfo;
 			Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			EditVoxels(p);
 		}
-	}
+	}*/
 
-	private void EditVoxels (Vector3 point) {
+	public void EditVoxels (Vector3 point) {
 		int clickX = (int)(point.x / VOXEL_SIZE);
 		int clickY = (int)(point.y / VOXEL_SIZE);
 
@@ -204,31 +204,8 @@ public class Terrain : MonoBehaviour {
 			}
 		}
 
-		/*
-		int voxelYOffset = yEnd * CHUNK_VOXELS_DIM;
-		for (int y = yEnd; y >= yStart; y--) {
-			int i = y * VIS_CHUNKS_DIM + xEnd;
-			int voxelXOffset = xEnd * CHUNK_VOXELS_DIM;
-			for (int x = xEnd; x >= xStart; x--, i--) {
-				activeStencil.SetCenter(centerX - voxelXOffset, centerY - voxelYOffset);
-				visibleChunks[i].Apply(activeStencil);
-				voxelXOffset -= CHUNK_VOXELS_DIM;
-			}
-			voxelYOffset -= CHUNK_VOXELS_DIM;
-		}
-		*/
 	}
 
 	private void OnGUI () {
-		/*
-		GUILayout.BeginArea(new Rect(4f, 4f, 200f, 500f));
-		GUILayout.Label("Fill Type");
-		fillTypeIndex = GUILayout.SelectionGrid(fillTypeIndex, fillTypeNames, 4);
-		GUILayout.Label("Radius");
-		radiusIndex = GUILayout.SelectionGrid(radiusIndex, radiusNames, 6);
-		GUILayout.Label("Stencil");
-		stencilIndex = GUILayout.SelectionGrid(stencilIndex, stencilNames, 2);
-		GUILayout.EndArea();
-		*/
 	}
 }

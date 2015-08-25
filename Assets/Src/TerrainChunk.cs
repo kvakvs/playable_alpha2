@@ -174,14 +174,4 @@ public class TerrainChunk : MonoBehaviour {
 		voxels[x + y * CHUNK_VOXELS_DIM].vtype = VoxelType.Empty;
 		RebuildMesh();
 	}
-
-	void OnDrawGizmos() {
-		if (!enabled || this == null || this.voxels == null) {
-			return;
-		}
-		// Draw a yellow sphere at the transform's position
-		//Gizmos.color = Color.yellow;
-		//Gizmos.DrawWireCube(this.voxels[0].position + new Vector2(CHUNK_SIZE/2, CHUNK_SIZE/2),
-		//                    new Vector3(CHUNK_SIZE, CHUNK_SIZE, 1));
-	}
 }
