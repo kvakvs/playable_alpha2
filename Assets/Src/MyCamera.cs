@@ -8,15 +8,15 @@ public class MyCamera : MonoBehaviour {
 	const float CAMERA_Z = -10;
 	const float CAMERA_SCROLL_SPEED = 0.04f;
 
-	const float MAP_WIDTH = VoxelMap.MAP_WIDTH;
-	const float MAP_HEIGHT = VoxelMap.MAP_HEIGHT;
+	const float MAP_WIDTH = Terrain.MAP_WIDTH;
+	const float MAP_HEIGHT = Terrain.MAP_HEIGHT;
 
 	// Use this for initialization
 	void Start () {
 		transform.position = new Vector3(MAP_WIDTH / 2, MAP_HEIGHT);
 		var pl = GameObject.Find ("Player");
-		pl.transform.position = transform.position + new Vector3(-5f * VoxelMap.VOXEL_SIZE, 2f, 0);
-		VoxelMap.instance.OnCameraPosChanged();
+		pl.transform.position = transform.position + new Vector3(-5f * Terrain.VOXEL_SIZE, 2f, 0);
+		Terrain.instance.OnCameraPosChanged();
 	}
 	
 	// Update is called once per frame
@@ -25,10 +25,10 @@ public class MyCamera : MonoBehaviour {
 		Vector3 plPos = pl.transform.position;
 
 		Vector3 dist = transform.localPosition - plPos;
-		if (dist.magnitude > VoxelMap.VOXEL_SIZE) {
+		if (dist.magnitude > Terrain.VOXEL_SIZE) {
 			plPos.z = CAMERA_Z;
 			transform.position = plPos;
-			VoxelMap.instance.OnCameraPosChanged();
+			Terrain.instance.OnCameraPosChanged();
 		}
 
 		// Free scroll with Middle Mouse
@@ -45,7 +45,7 @@ public class MyCamera : MonoBehaviour {
 			diff += transform.position;
 			transform.position = new Vector3(diff.x, diff.y, CAMERA_Z);
 				//new Vector3(ms_pos.x, ms_pos.y, CAMERA_Z);
-			VoxelMap.instance.OnCameraPosChanged();
+			Terrain.instance.OnCameraPosChanged();
 		}
 	}
 }

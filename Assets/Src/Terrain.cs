@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class VoxelMap : MonoBehaviour {
+public class Terrain : MonoBehaviour {
 
 	private static string[] fillTypeNames = {"Empty", "Dirt", "Stone", "Iron"};
 	private static string[] radiusNames = {"0", "1", "2", "3", "4", "5"};
@@ -20,7 +20,7 @@ public class VoxelMap : MonoBehaviour {
 	const int Y_CHUNK_COUNT = MAP_NUM_ROWS / CHUNK_VOXELS_DIM;
 	const int TOTAL_CHUNKS  = X_CHUNK_COUNT * Y_CHUNK_COUNT;
 
-	public const float VOXEL_SIZE   = 0.075f; //CHUNK_SIZE / CHUNK_VOXELS_DIM;
+	public const float VOXEL_SIZE   = 0.15f; //CHUNK_SIZE / CHUNK_VOXELS_DIM;
 	public const float CHUNK_SIZE   = CHUNK_VOXELS_DIM * VOXEL_SIZE; //VISIBLE_SIZE / VIS_CHUNKS_DIM;
 	const        float VISIBLE_SIZE = CHUNK_SIZE * VIS_CHUNKS_DIM;
 
@@ -34,7 +34,7 @@ public class VoxelMap : MonoBehaviour {
 	private VoxelChunk[] visibleChunks;
 	
 	private int fillTypeIndex, radiusIndex, stencilIndex;
-	public static VoxelMap instance;
+	public static Terrain instance;
 
 	private VoxelStencil[] stencils = {
 		new VoxelStencil(),
@@ -113,7 +113,7 @@ public class VoxelMap : MonoBehaviour {
 	}
 	
 	private void Awake () {
-		VoxelMap.instance = this;
+		Terrain.instance = this;
 
 		this.voxels = new Voxel[TOTAL_CHUNKS][];
 		for (int i = 0, y = 0; y < Y_CHUNK_COUNT; y++) {

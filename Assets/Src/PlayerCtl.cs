@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PlayerCtl : MonoBehaviour {
 
-	const float MAX_SPEED = 0.6f;
+	const float MAX_SPEED = Terrain.VOXEL_SIZE * 10f; // 10 vox per sec
 	const float JUMP_FORCE = 160f;
 
 	Rigidbody2D rb2d;

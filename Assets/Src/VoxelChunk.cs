@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 [SelectionBase]
 public class VoxelChunk : MonoBehaviour {
-	const int CHUNK_VOXELS_DIM = VoxelMap.CHUNK_VOXELS_DIM;
-	const float CHUNK_SIZE = VoxelMap.CHUNK_SIZE;
-	const float VOXEL_SIZE = VoxelMap.VOXEL_SIZE;
+	const int CHUNK_VOXELS_DIM = Terrain.CHUNK_VOXELS_DIM;
+	const float CHUNK_SIZE = Terrain.CHUNK_SIZE;
+	const float VOXEL_SIZE = Terrain.VOXEL_SIZE;
 
 	private Voxel[] voxels;
 

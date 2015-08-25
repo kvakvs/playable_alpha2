@@ -31,7 +31,7 @@ public class Voxel {
 	public Vector2 position; // Bottom-left (origin)
 	public Vector2 opposite; // Top-right (opposite origin)
 
-	const float VOXEL_SIZE = VoxelMap.VOXEL_SIZE;
+	const float VOXEL_SIZE = Terrain.VOXEL_SIZE;
 
 	public Voxel (int x, int y) {
 		vtype = VoxelType.Empty;
