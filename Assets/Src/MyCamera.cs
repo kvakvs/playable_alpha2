@@ -21,12 +21,15 @@ public class MyCamera : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		/*var pl = GameObject.Find ("Player");
-		Vector3 dist = transform.localPosition - pl.transform.position;
+		var pl = GameObject.Find ("Player");
+		Vector3 plPos = pl.transform.position;
+
+		Vector3 dist = transform.localPosition - plPos;
 		if (dist.magnitude > VoxelMap.VOXEL_SIZE) {
-			transform.localPosition = pl.transform.position;
+			plPos.z = CAMERA_Z;
+			transform.position = plPos;
 			VoxelMap.instance.OnCameraPosChanged();
-		}*/
+		}
 
 		// Free scroll with Middle Mouse
 		if (Input.GetMouseButtonDown(2))

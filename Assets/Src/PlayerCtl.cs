@@ -3,12 +3,16 @@ using System.Collections;
 
 public class PlayerCtl : MonoBehaviour {
 
-	Rigidbody2D rb2d;
 	const float MAX_SPEED = 0.6f;
 	const float JUMP_FORCE = 160f;
 
+	Rigidbody2D rb2d;
+	Animator anim;
+	bool facingRight = true;
+
 	void Start () {
 		rb2d = GetComponent<Rigidbody2D>();
+		anim = GetComponent<Animator>();
 	}
 
 	void Update() {
@@ -21,7 +25,23 @@ public class PlayerCtl : MonoBehaviour {
 
 	void FixedUpdate () {
 		float moveX = Input.GetAxis("Horizontal");
-
 		rb2d.velocity = new Vector2(moveX * MAX_SPEED, rb2d.velocity.y);
+
+		anim.SetFloat("Speed", Mathf.Abs(moveX));
+
+		bool newFacingRight = facingRight;
+		if (moveX < 0f) {
+			newFacingRight = false;
+		} else if (moveX > 0f) {
+			newFacingRight = true;
+		}
+		if (newFacingRight != facingRight) {
+			facingRight = newFacingRight;
+			if (facingRight) {
+				transform.localScale = new Vector3(1f, 1f, 1f);
+			} else {
+				transform.localScale = new Vector3(-1f, 1f, 1f);
+			}
+		}
 	}
 }
