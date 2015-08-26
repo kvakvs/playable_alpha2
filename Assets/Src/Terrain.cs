@@ -157,18 +157,22 @@ public class Terrain : MonoBehaviour {
 		}
 	}
 
+	const float PERLIN_DIRT_SCALE = 1 / (10f * VOXEL_SIZE);
+	const float PERLIN_ORE_SCALE = 1 / (6f * VOXEL_SIZE);
+	const float PERLIN_VOID_SCALE = 1 / (10f * VOXEL_SIZE);
+
 	private VoxelType GenerateRandomStoneDirt(float x, float y) {
-		double rnd = Mathf.Min (Mathf.PerlinNoise(x, y), 1f);
+		double rnd = Mathf.Min (Mathf.PerlinNoise(x * PERLIN_DIRT_SCALE, y * PERLIN_DIRT_SCALE), 1f);
 		if (rnd < 0.7f) { return VoxelType.Dirt; }
 		return VoxelType.Stone;
 	}
 	private VoxelType GenerateRandomOre(VoxelType vt, float x, float y) {
-		double rnd = Mathf.Min (Mathf.PerlinNoise(x, y), 1f);
+		double rnd = Mathf.Min (Mathf.PerlinNoise(x * PERLIN_ORE_SCALE, y * PERLIN_ORE_SCALE), 1f);
 		if (rnd < 0.15f) { return VoxelType.IronOre; }
 		return vt; // else do not change
 	}
 	private VoxelType GenerateRandomVoid(VoxelType vt, float x, float y) {
-		double rnd = Mathf.Min (Mathf.PerlinNoise(x, y), 1f);
+		double rnd = Mathf.Min (Mathf.PerlinNoise(x * PERLIN_VOID_SCALE, y * PERLIN_VOID_SCALE), 1f);
 		if (rnd < 0.25f) { return VoxelType.Empty; }
 		return vt; // else do not change
 	}

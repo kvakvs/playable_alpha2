@@ -13,7 +13,7 @@ public class MyCamera : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		transform.position = new Vector3(MAP_WIDTH / 2, MAP_HEIGHT);
+		transform.position = new Vector3(MAP_WIDTH / 2, MAP_HEIGHT - 2.85f);
 		var pl = GameObject.Find ("Player");
 		pl.transform.position = transform.position + new Vector3(-5f * Terrain.VOXEL_SIZE, 2f, 0);
 		Terrain.instance.OnCameraPosChanged();
@@ -28,7 +28,9 @@ public class MyCamera : MonoBehaviour {
 		if (dist.magnitude > Terrain.VOXEL_SIZE) {
 			plPos.z = CAMERA_Z;
 			transform.position = plPos;
-			Terrain.instance.OnCameraPosChanged();
+			if (Terrain.instance) {
+				Terrain.instance.OnCameraPosChanged();
+			}
 		}
 
 		// Free scroll with Middle Mouse

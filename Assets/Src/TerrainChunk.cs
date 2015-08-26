@@ -7,6 +7,9 @@ public class TerrainChunk : MonoBehaviour {
 	const float CHUNK_SIZE = Terrain.CHUNK_SIZE;
 	const float VOXEL_SIZE = Terrain.VOXEL_SIZE;
 
+	public const int LAYERID_SOLID = 9;
+	public const int LAYERMASK_SOLID = 1 << LAYERID_SOLID;
+
 	private Voxel[] voxels;
 
 	private Mesh mesh;
@@ -85,6 +88,7 @@ public class TerrainChunk : MonoBehaviour {
 		// Create one child GameObject for each row
 		for (int y = 0; y < CHUNK_VOXELS_DIM; y++) {
 			GameObject coll_go = new GameObject();
+			coll_go.layer = LAYERID_SOLID;
 			coll_go.transform.parent = transform;
 
 			BoxCollider2D   bc = coll_go.AddComponent<BoxCollider2D>();
