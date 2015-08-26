@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerCtl : MonoBehaviour {
 
 	const float MAX_SPEED = Terrain.VOXEL_SIZE * 10f; // 10 vox per sec
-	const float JUMP_FORCE = 160f;
+	float jumpForce; // 
 
 	Rigidbody2D rb2d;
 	Animator anim;
@@ -13,11 +13,12 @@ public class PlayerCtl : MonoBehaviour {
 	void Start () {
 		rb2d = GetComponent<Rigidbody2D>();
 		anim = GetComponent<Animator>();
+		jumpForce = Terrain.VOXEL_SIZE * 48f * Mathf.Abs(Physics2D.gravity.y);
 	}
 
 	void Update() {
 		if (Input.GetKeyDown(KeyCode.Space)) {
-			rb2d.AddForce(new Vector2(0, JUMP_FORCE));
+			rb2d.AddForce(new Vector2(0, jumpForce));
 		}
 
 		// BUG BUG: When player is out of screen, colliders are deleted and player falls
@@ -37,9 +38,9 @@ public class PlayerCtl : MonoBehaviour {
 		anim.SetFloat("Speed", Mathf.Abs(moveX));
 
 		bool newFacingRight = facingRight;
-		if (moveX < 0f) {
+		if (moveX < 0.1f) {
 			newFacingRight = false;
-		} else if (moveX > 0f) {
+		} else if (moveX > 0.1f) {
 			newFacingRight = true;
 		}
 		if (newFacingRight != facingRight) {

@@ -21,8 +21,8 @@ public class Terrain : MonoBehaviour {
 	const int Y_CHUNK_COUNT = MAP_NUM_ROWS / CHUNK_VOXELS_DIM;
 	const int TOTAL_CHUNKS  = X_CHUNK_COUNT * Y_CHUNK_COUNT;
 
-	public const float VOXEL_SIZE   = 0.15f; //CHUNK_SIZE / CHUNK_VOXELS_DIM;
-	public const float CHUNK_SIZE   = CHUNK_VOXELS_DIM * VOXEL_SIZE; //VISIBLE_SIZE / VIS_CHUNKS_DIM;
+	public const float VOXEL_SIZE   = 0.6f; // x3 = 1.8 human height
+	public const float CHUNK_SIZE   = CHUNK_VOXELS_DIM * VOXEL_SIZE;
 	const        float VISIBLE_SIZE = CHUNK_SIZE * VIS_CHUNKS_DIM;
 
 	public TerrainChunk voxelGridPrefab;
