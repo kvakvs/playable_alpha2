@@ -34,7 +34,7 @@ public class MyCamera : MonoBehaviour {
 		}
 
 		// Free scroll with Middle Mouse
-		if (Input.GetMouseButtonDown(2))
+		/*if (Input.GetMouseButtonDown(2))
 		{
 		}
 
@@ -49,5 +49,6 @@ public class MyCamera : MonoBehaviour {
 				//new Vector3(ms_pos.x, ms_pos.y, CAMERA_Z);
 			Terrain.instance.OnCameraPosChanged();
 		}
+		*/
 	}
 }

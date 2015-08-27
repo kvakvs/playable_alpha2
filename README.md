@@ -6,6 +6,7 @@ Terraria-like digging sandbox made with Unity3D/C#.
 
 * Large generated underground world
 * Procedural mesh chunks tech to render the voxels efficiently
+* Raycast-controlled character which runs, falls, jumps and walks onto 1-block steps.
 
 # How to try
 
