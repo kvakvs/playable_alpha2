@@ -29,8 +29,7 @@ public class TerrainChunk : MonoBehaviour {
 		//gridSize = size;
 		//voxelSize = size / (float)chunk_sz;
 
-		mesh = new Mesh();
-		mesh.name = "Generated Terrain Mesh";
+		mesh = null;
 
 		// TODO: optimize this with preallocated array
 		gen_vertices  = new List<Vector3>();
@@ -60,7 +59,10 @@ public class TerrainChunk : MonoBehaviour {
 		gen_vertices.Clear();
 		gen_uv.Clear();
 		gen_triangles.Clear();
-		mesh.Clear();
+
+		if (mesh != null) { DestroyImmediate(mesh); }
+		mesh = new Mesh();
+		mesh.name = "Generated Terrain Mesh";
 
 		TriangulateCellRows();
 		RebuildColliders();

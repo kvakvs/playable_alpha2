@@ -3,16 +3,25 @@ using System.Collections;
 
 public class PlayerCtl : MonoBehaviour {
 	enum MovementDecision {
-		Stay, Move, StepUp
+		Stay, Move, StepOnABlock
 	};
 
 	const float VOXEL_SIZE = Terrain.VOXEL_SIZE;
-	const float MAX_SPEED = VOXEL_SIZE * 10f; // 10 vox per sec
-	const float WALK_SPEED = VOXEL_SIZE * 0.2f; // speed used in update
-	const float FALL_SPEED = VOXEL_SIZE * 0.3f; // fall speed in update
-	const float JUMP_SPEED = VOXEL_SIZE * 0.3f; // fall speed in update
+	//const float MAX_SPEED = VOXEL_SIZE * 10f; // 10 vox per sec
+	const float WALK_SPEED = VOXEL_SIZE * 12f; // speed (per second)
+	const float FALL_SPEED = VOXEL_SIZE * 20f; // fall speed (per second)
+	const float JUMP_SPEED = VOXEL_SIZE * 20f; // jump speed (per second)
+	const float JUMP_DURATION = 0.2f;
+	const float TOUCH_DISTANCE = 0.2f * VOXEL_SIZE; // how near can come to the wall
+	const float HALF_CHAR_WIDTH = VOXEL_SIZE * 0.7f;
+	const float HALF_FEET_WIDTH = VOXEL_SIZE * 0.7f;
+	const float STEP_UP_SPEED = VOXEL_SIZE * 20f;
+	const float PLAYER_CENTER_TO_FEET = VOXEL_SIZE * 1.55f;
+
 	//float jumpForce; 
-	public bool isStanding; // feet on the ground
+	public bool isGrounded; // feet on the ground
+	float jumpStartTime = 0f;
+	float stepLevel; // when step on a block detected, here will be new level Y
 
 	Animator anim;
 	bool facingRight = true;
@@ -30,8 +39,9 @@ public class PlayerCtl : MonoBehaviour {
 	}
 
 	void Update() {
-		if (Input.GetKeyDown(KeyCode.Space)) {
+		if (Input.GetKeyDown(KeyCode.Space) && isGrounded) {
 			isJumping = true;
+			jumpStartTime = Time.time;
 		}
 
 		// BUG BUG: When player is out of screen, colliders are deleted and player falls
@@ -46,6 +56,11 @@ public class PlayerCtl : MonoBehaviour {
 		// Movement handling
 		float moveX = Input.GetAxis("Horizontal");
 		CheckWallsAndSteps(moveX);
+
+		if (isJumping && Time.time - jumpStartTime >= JUMP_DURATION) {
+			isJumping = false;
+		}
+
 		if (isJumping) {
 			CheckCeiling();
 		} else {
@@ -77,59 +92,99 @@ public class PlayerCtl : MonoBehaviour {
 			}
 		}
 
-		float dirX = WALK_SPEED;
-		if (moveX < 0) dirX = -WALK_SPEED;
-
-		switch (CanMove (dirX)) {
-		case MovementDecision.Move:
-			transform.position += new Vector3(dirX, 0f, 0f);
-			return;
-		case MovementDecision.StepUp:
-			transform.position += new Vector3(dirX * .5f, VOXEL_SIZE * .5f, 0f);
-			return;
+		float wallTouchDist;
+		switch (CanMove (moveX, out wallTouchDist)) {
+		case MovementDecision.Move: {
+				float dirX = Mathf.Min (wallTouchDist * .95f, 
+			                        	WALK_SPEED * Time.deltaTime) * Mathf.Sign(moveX);
+				transform.position += new Vector3(dirX, 0f, 0f);
+				return; 
+			}
+		case MovementDecision.StepOnABlock: {
+				float dirX = Mathf.Min (wallTouchDist * .95f, 
+				                        WALK_SPEED * Time.deltaTime) * Mathf.Sign(moveX);
+				transform.position = new Vector3(transform.position.x + dirX, 
+			                                 stepLevel + PLAYER_CENTER_TO_FEET, 0f);
+				return; 
+			}
 		case MovementDecision.Stay:
 			return;
 		}
 	}
 
-	MovementDecision CanMove(float dirX) {
-		// Head forward
-		var r1 = CastRay(new Vector2(transform.position.x, transform.position.y + VOXEL_SIZE * .5f), 
-	                      new Vector2(dirX, 0));
-		if (r1.collider != null) { return MovementDecision.Stay; }
+	MovementDecision CanMove(float moveX, out float wallTouchDist) {
+		Vector2 dirVector = moveX > 0 ? Vector2.right : Vector2.left;
+		float halfCharacter = dirVector.x * HALF_CHAR_WIDTH;
+		float frontX = transform.position.x + halfCharacter;
+		wallTouchDist = 99f;
+
+		// Head forward (top)
+		var r0 = CastRay(new Vector2(frontX, transform.position.y + VOXEL_SIZE * 1.45f), 
+		                 dirVector);
+		if (r0.collider != null) {
+			wallTouchDist = Mathf.Abs (r0.point.x - frontX);
+			if (wallTouchDist < TOUCH_DISTANCE) { 
+				return MovementDecision.Stay;
+			}
+		} 
+
+		// Head forward (neck)
+		var r1 = CastRay(new Vector2(frontX, transform.position.y + VOXEL_SIZE * .5f), 
+		                 dirVector);
+		if (r1.collider != null) {
+			wallTouchDist = Mathf.Abs (r1.point.x - frontX);
+			if (wallTouchDist < TOUCH_DISTANCE) { 
+				return MovementDecision.Stay;
+			}
+		}
 
 		// Torso forward
-		var r2 = CastRay(new Vector2(transform.position.x, transform.position.y - VOXEL_SIZE * .5f), 
-		                  new Vector2(dirX, 0));
-		if (r2.collider != null) { return MovementDecision.Stay; }
+		var r2 = CastRay(new Vector2(frontX, transform.position.y - VOXEL_SIZE * .5f), 
+		                 dirVector);
+		if (r2.collider != null) {
+			wallTouchDist = Mathf.Abs (r2.point.x - frontX);
+			if (wallTouchDist < TOUCH_DISTANCE) { 
+				return MovementDecision.Stay;
+			}
+		}
 
 		// Feet forward
-		var feet = CastRay(new Vector2(transform.position.x, transform.position.y - VOXEL_SIZE * 1.5f), 
-		                    new Vector2(dirX, 0));		
+		var feet = CastRay(new Vector2(frontX, transform.position.y - VOXEL_SIZE * 1.45f), 
+		                   dirVector);
 
 		// If feet collide with the wall, but torso and head did not - we can try and step up
 		if (feet.collider != null) {
-			return MovementDecision.StepUp;
+			wallTouchDist = Mathf.Abs (feet.point.x - frontX);
+			if (wallTouchDist < TOUCH_DISTANCE) {
+				stepLevel = feet.collider.bounds.max.y;
+				return MovementDecision.StepOnABlock;
+			}
 		}
 		return MovementDecision.Move;
+	}
+
+	float GetFeetY() {
+		return transform.position.y - PLAYER_CENTER_TO_FEET;
 	}
 
 	//
 	// Possibly falling. Check voxels under the feet
 	//
 	void CheckFloorAndFall() {
-		float feetY = transform.position.y - VOXEL_SIZE * 1.55f;
-		var r1 = CastRay(new Vector2(transform.position.x - VOXEL_SIZE * .5f, feetY), Vector2.down);
-		var r2 = CastRay(new Vector2(transform.position.x + VOXEL_SIZE * .5f, feetY), Vector2.down);
+		float feetY = GetFeetY();
+		var r1 = CastRay(new Vector2(transform.position.x - HALF_FEET_WIDTH, feetY),
+		                 Vector2.down);
+		var r2 = CastRay(new Vector2(transform.position.x + HALF_FEET_WIDTH, feetY),
+		                 Vector2.down);
 
 		// Shift values so that we have to deal with left collision, or both
 		if (r1.collider == null) { r1 = r2; }
-		this.isStanding = (r1.collider != null);
+		this.isGrounded = (r1.collider != null);
 
 		float hitY = r2.collider != null ? Mathf.Max (r1.point.y, r2.point.y) : r1.point.y;
 		float distanceToFloor = Mathf.Abs(hitY - feetY);
 
-		float fall = Mathf.Min (distanceToFloor, FALL_SPEED);
+		float fall = Mathf.Min (distanceToFloor, FALL_SPEED * Time.deltaTime);
 		transform.position += new Vector3(0f, -fall, 0f);
 	}
 
@@ -137,19 +192,21 @@ public class PlayerCtl : MonoBehaviour {
 	// Jumping (moving vertically up) so check the upper limit
 	//
 	void CheckCeiling() {
-		float headY = transform.position.y + VOXEL_SIZE * .95f;
-		var r1 = CastRay(new Vector2(transform.position.x - VOXEL_SIZE * .5f, headY), Vector2.up);
-		var r2 = CastRay(new Vector2(transform.position.x + VOXEL_SIZE * .5f, headY), Vector2.up);
+		float headY = transform.position.y + VOXEL_SIZE * 1.45f;
+		var r1 = CastRay(new Vector2(transform.position.x - HALF_CHAR_WIDTH, headY), 
+		                 Vector2.up);
+		var r2 = CastRay(new Vector2(transform.position.x + HALF_CHAR_WIDTH, headY), 
+		                 Vector2.up);
 		
 		// Shift values so that we have to deal with left collision, or both
 		if (r1.collider == null) { r1 = r2; }
 
 		float hitY = r2.collider != null ? Mathf.Min (r1.point.y, r2.point.y) : r1.point.y;
 		float distanceToCeil = Mathf.Abs(hitY - headY);
-		if (distanceToCeil < 0.5f * VOXEL_SIZE) {
+		if (distanceToCeil < TOUCH_DISTANCE) {
 			isJumping = false;
 		} else {
-			float jump = Mathf.Min (distanceToCeil, JUMP_SPEED);
+			float jump = Mathf.Min (distanceToCeil, JUMP_SPEED * Time.deltaTime);
 			transform.position += new Vector3(0f, jump, 0f);
 		}
 	}
