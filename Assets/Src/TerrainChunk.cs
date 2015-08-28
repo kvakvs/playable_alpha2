@@ -13,6 +13,7 @@ public class TerrainChunk : MonoBehaviour {
 	private Voxel[] voxels;
 
 	private Mesh mesh;
+	private Transform meshes; // grouping for submeshes
 
 	private List<Vector3> gen_vertices;
 	private List<int>     gen_triangles;
@@ -30,6 +31,7 @@ public class TerrainChunk : MonoBehaviour {
 		//voxelSize = size / (float)chunk_sz;
 
 		mesh = null;
+		meshes = transform.FindChild("Meshes");
 
 		// TODO: optimize this with preallocated array
 		gen_vertices  = new List<Vector3>();
@@ -80,8 +82,8 @@ public class TerrainChunk : MonoBehaviour {
 
 	void RebuildColliders ()
 	{
-		while (transform.childCount > 0) {
-			DestroyImmediate(transform.GetChild(0).gameObject);
+		while (meshes.transform.childCount > 0) {
+			DestroyImmediate(meshes.transform.GetChild(0).gameObject);
 		}
 
 		Vector2 chunkOrigin = new Vector2(chunkX * CHUNK_SIZE, chunkY * CHUNK_SIZE); //voxels[0].position;
@@ -91,7 +93,7 @@ public class TerrainChunk : MonoBehaviour {
 		for (int y = 0; y < CHUNK_VOXELS_DIM; y++) {
 			GameObject coll_go = new GameObject();
 			coll_go.layer = LAYERID_SOLID;
-			coll_go.transform.parent = transform;
+			coll_go.transform.parent = meshes.transform;
 
 			BoxCollider2D   bc = coll_go.AddComponent<BoxCollider2D>();
 			bc.transform.parent = coll_go.transform;

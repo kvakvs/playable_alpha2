@@ -11,8 +11,8 @@ public class Terrain : MonoBehaviour {
 	public const float MAP_WIDTH = MAP_NUM_COLS * VOXEL_SIZE - CHUNK_SIZE;
 	public const float MAP_HEIGHT = MAP_NUM_ROWS * VOXEL_SIZE - CHUNK_SIZE;
 
-	public const int CHUNK_VOXELS_DIM = 8;
-	const int VIS_CHUNKS_DIM  = 5;
+	public const int CHUNK_VOXELS_DIM = 16;
+	const int VIS_CHUNKS_DIM  = 3;
 	const int VIS_CHUNKS = VIS_CHUNKS_DIM * VIS_CHUNKS_DIM;
 	const int VOXELS_PER_CHUNK = CHUNK_VOXELS_DIM * CHUNK_VOXELS_DIM;
 
@@ -192,13 +192,29 @@ public class Terrain : MonoBehaviour {
 		}
 	}*/
 
+	public void FindVoxel(Vector3 point, ref Voxel vox, ref TerrainChunk tc) {
+		int clickX = (int)(point.x / VOXEL_SIZE);
+		int clickY = (int)(point.y / VOXEL_SIZE);
+		
+		int chunkX = clickX / CHUNK_VOXELS_DIM;
+		int chunkY = clickY / CHUNK_VOXELS_DIM;
+
+		int chunkIndex = chunkY * X_CHUNK_COUNT + chunkX;
+		int voxelIndex = (clickY % CHUNK_VOXELS_DIM) * CHUNK_VOXELS_DIM + (clickX % CHUNK_VOXELS_DIM);
+		vox = voxels[chunkIndex][voxelIndex];
+		for (int i = 0; i < VIS_CHUNKS; i++) {
+			if (visibleChunks[i].IsUsingVoxels(voxels[chunkIndex])) {
+				tc = visibleChunks[i];
+			}
+		}
+	}
+
 	public void EditVoxels (Vector3 point) {
 		int clickX = (int)(point.x / VOXEL_SIZE);
 		int clickY = (int)(point.y / VOXEL_SIZE);
 
 		int chunkX = clickX / CHUNK_VOXELS_DIM;
 		int chunkY = clickY / CHUNK_VOXELS_DIM;
-		//Debug.Log("clickX=" + clickX + " chunkX=" + chunkX);
 
 		int voxIndex = chunkY * X_CHUNK_COUNT + chunkX;
 		if (voxIndex < 0 || voxIndex >= TOTAL_CHUNKS) {

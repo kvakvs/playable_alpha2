@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Random = UnityEngine.Random;
 
 public class PlayerCtl : MonoBehaviour 
 {
@@ -23,6 +24,7 @@ public class PlayerCtl : MonoBehaviour
 	Animator anim;
 	bool facingRight = true;
 	bool isJumping = false;
+	public GameObject pfLoot; // prefab to clone for loot drop
 
 	// Player can not move through the solid layer
 	private const int COLLISION_MASK = TerrainChunk.LAYERMASK_SOLID;
@@ -47,7 +49,7 @@ public class PlayerCtl : MonoBehaviour
 		if (Input.GetMouseButton /*Down*/(0)) {
 			//RaycastHit hitInfo;
 			Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			Terrain.instance.EditVoxels(p);
+			Dig(p);
 			anim.SetTrigger("Dig");
 		}
 
@@ -67,6 +69,23 @@ public class PlayerCtl : MonoBehaviour
 		}
 
 		transform.position = pos;
+	}
+
+	// Find targeted voxel, check its toughness points, remove voxel and create loot object
+	void Dig(Vector3 p) {
+		Voxel vox = null;
+		TerrainChunk chunk = null;
+		Terrain.instance.FindVoxel(p, ref vox, ref chunk);
+
+		if (vox.IsSolid() && chunk != null) {
+			GameObject loot = Instantiate (pfLoot);
+			loot.transform.parent = chunk.transform;
+			loot.transform.localPosition = new Vector3(vox.position.x, vox.position.y, 0f)
+										+ new Vector3(VOXEL_SIZE * .5f, VOXEL_SIZE * .5f, 0f);
+			loot.transform.localRotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 90f));
+
+			Terrain.instance.EditVoxels(p);
+		}
 	}
 
 	// Want to move left or right. Check walls, possibly 1-voxel steps
@@ -130,7 +149,7 @@ public class PlayerCtl : MonoBehaviour
 
 				// Using Mathf.Floor to calculate floor!
 				var pos1 = pos;
-				pos1.y = Mathf.Floor((pos1.y + 0.99f * VOXEL_SIZE) / VOXEL_SIZE) * VOXEL_SIZE;
+				pos1.y = pos1.y + VOXEL_SIZE;
 				return TryWalk(pos1, moveX, false);
 			}
 		}
