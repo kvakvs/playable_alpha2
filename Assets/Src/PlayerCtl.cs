@@ -78,12 +78,13 @@ public class PlayerCtl : MonoBehaviour
 		Terrain.instance.FindVoxel(p, ref vox, ref chunk);
 
 		if (vox.IsSolid() && chunk != null) {
+			/*
 			GameObject loot = Instantiate (pfLoot);
 			loot.transform.parent = chunk.transform;
 			loot.transform.localPosition = new Vector3(vox.position.x, vox.position.y, 0f)
 										+ new Vector3(VOXEL_SIZE * .5f, VOXEL_SIZE * .5f, 0f);
 			loot.transform.localRotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 90f));
-
+			*/
 			Terrain.instance.EditVoxels(p);
 		}
 	}

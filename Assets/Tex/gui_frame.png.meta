@@ -1,17 +1,21 @@
 fileFormatVersion: 2
-guid: 0861e613cd72b624eb0f733b32926bc1
-timeCreated: 1440543746
+guid: af7e6f89da0ce2b49a81c3ade207969a
+timeCreated: 1440974703
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: items_0
-    21300002: items_1
-    21300004: items_2
-    21300006: items_3
+    21300000: gui_frame_0
+    21300002: gui_frame_1
+    21300004: gui_frame_2
+    21300006: gui_frame_3
+    21300008: gui_frame_4
+    21300010: gui_frame_5
+    21300012: gui_frame_6
+    21300014: gui_frame_7
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 1
+    enableMipMap: 0
     linearTexture: 0
     correctGamma: 0
     fadeOut: 0
@@ -31,17 +35,17 @@ TextureImporter:
   cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
   textureFormat: -1
-  maxTextureSize: 512
+  maxTextureSize: 64
   textureSettings:
     filterMode: 0
-    aniso: 16
+    aniso: 1
     mipBias: -1
     wrapMode: 1
   nPOTScale: 0
   lightmap: 0
   rGBM: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -53,41 +57,81 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: items_0
+    - name: gui_frame_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 496
+        y: 32
         width: 16
         height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: items_1
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 480
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: items_2
+    - name: gui_frame_1
       rect:
         serializedVersion: 2
         x: 16
-        y: 480
+        y: 32
         width: 16
         height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: items_3
+    - name: gui_frame_2
       rect:
         serializedVersion: 2
         x: 32
-        y: 480
+        y: 32
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: gui_frame_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: gui_frame_4
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: gui_frame_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: gui_frame_6
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: gui_frame_7
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
         width: 16
         height: 16
       alignment: 0
