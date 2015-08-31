@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Random = UnityEngine.Random;
+using Assert = UnityEngine.Assertions.Assert;
 
 public class PlayerCtl : MonoBehaviour 
 {
@@ -32,9 +33,20 @@ public class PlayerCtl : MonoBehaviour
 	const int LAYERID_PLAYER = 8;
 	public const int LAYERMASK_PLAYER = 1 << LAYERID_PLAYER;
 
+	//
+	// Stuff player owns
+	//
+	public Inventory inventory;
+	public GuiInventory guiInventory;
+
 	void Start () {
 		anim = GetComponent<Animator>();
-		//jumpForce = Terrain.VOXEL_SIZE * 48f * Mathf.Abs(Physics2D.gravity.y);
+
+		inventory = new Inventory ();
+		inventory.AddNoStack (Item.Create (Item.PresetId.OldStonePick));
+
+		Assert.IsNotNull (guiInventory);
+		guiInventory.UpdateGuiElements (inventory);
 	}
 
 	void Update() {
@@ -85,6 +97,8 @@ public class PlayerCtl : MonoBehaviour
 										+ new Vector3(VOXEL_SIZE * .5f, VOXEL_SIZE * .5f, 0f);
 			loot.transform.localRotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 90f));
 			*/
+			inventory.AddAndStack (Item.Create (Item.PresetId.DirtBlock));
+			guiInventory.UpdateGuiElements (inventory);
 			Terrain.instance.EditVoxels(p);
 		}
 	}
