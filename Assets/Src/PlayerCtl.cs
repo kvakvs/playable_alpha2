@@ -24,7 +24,7 @@ public class PlayerCtl : MonoBehaviour
 	Animator anim;
 	bool facingRight = true;
 	bool isJumping = false;
-	public GameObject pfLoot; // prefab to clone for loot drop
+	//public GameObject pfLoot; // prefab to clone for loot drop
 
 	// Player can not move through the solid layer
 	private const int COLLISION_MASK = TerrainChunk.LAYERMASK_SOLID;
