@@ -17,15 +17,16 @@ public class Inventory {
 	}
 
 	// Adds item and tries to stack if it existed in inventory
-	public void AddAndStack(Item i) {
-		var pos = items.FindIndex (delegate(Item other) {
-			return other.type == i.type 
-				&& other.group == i.group 
-				&& other.quality == i.quality
-				&& other.preset.stackSize > 1;
+	public void AddAndStack(Item newItem) {
+		var pos = items.FindIndex (delegate(Item haveItem) {
+			return haveItem.type == newItem.type 
+				&& haveItem.group == newItem.group 
+				&& haveItem.quality == newItem.quality
+				&& haveItem.stack + newItem.stack < haveItem.preset.stackSize;
 		});
+		// TODO: remove stack size check and split stack on overflow
 		if (pos == -1) {
-			AddNoStack (i);
+			AddNoStack (newItem);
 		} else {
 			items[pos].stack++;
 		}

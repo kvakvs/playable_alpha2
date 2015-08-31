@@ -97,8 +97,11 @@ public class PlayerCtl : MonoBehaviour
 										+ new Vector3(VOXEL_SIZE * .5f, VOXEL_SIZE * .5f, 0f);
 			loot.transform.localRotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 90f));
 			*/
-			inventory.AddAndStack (Item.Create (Item.PresetId.DirtBlock));
-			guiInventory.UpdateGuiElements (inventory);
+			var itemPresetId = vox.GetBlockItemPresetId ();
+			if (itemPresetId != Item.PresetId.Void) {
+				inventory.AddAndStack (Item.Create (itemPresetId));
+				guiInventory.UpdateGuiElements (inventory);
+			}
 			Terrain.instance.EditVoxels(p);
 		}
 	}
@@ -160,7 +163,7 @@ public class PlayerCtl : MonoBehaviour
 			// Check over head if we can step up
 			if (stepUp && GetDistanceToCeiling() >= VOXEL_SIZE && isGrounded) {
 				// Shift up and try if we fit
-				float stairHeight = VOXEL_SIZE;
+				//float stairHeight = VOXEL_SIZE;
 
 				// Using Mathf.Floor to calculate floor!
 				var pos1 = pos;

@@ -2,10 +2,6 @@
 
 public class Terrain : MonoBehaviour {
 
-	private static string[] fillTypeNames = {"Empty", "Dirt", "Stone", "Iron"};
-	private static string[] radiusNames = {"0", "1", "2", "3", "4", "5"};
-	private static string[] stencilNames = {"Square", "Circle"};
-
 	const int MAP_NUM_COLS  = 1024;
 	const int MAP_NUM_ROWS  = 512;
 	public const float MAP_WIDTH = MAP_NUM_COLS * VOXEL_SIZE - CHUNK_SIZE;

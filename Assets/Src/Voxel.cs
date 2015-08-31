@@ -45,6 +45,18 @@ public class Voxel {
 
 	public Voxel () {}
 
+	public Item.PresetId GetBlockItemPresetId() {
+		switch (m_vtype) {
+		case VoxelType.Dirt:
+			return Item.PresetId.DirtBlock;
+		case VoxelType.Stone:
+			return Item.PresetId.StoneBlock;
+		case VoxelType.IronOre:
+			return Item.PresetId.IronOreBlock;
+		}
+		return Item.PresetId.Void;
+	}
+
 	public bool IsSolid() {
 		return m_vtype != VoxelType.Empty;
 	}

@@ -44,13 +44,16 @@ public class Item {
 	public enum PresetId {
 		OldStonePick,
 		DirtBlock,
-		StoneBlock
+		StoneBlock,
+		IronOreBlock,
+		Void
 	};
 	static readonly IList<ItemPreset> itemPresets = new ReadOnlyCollection<ItemPreset>(
 		new[] {
 			new ItemPreset(ItemGroup.Tool, ItemType.Pick, "Old Stone Pick", ItemQuality.Poor, 0, 1),
 			new ItemPreset(ItemGroup.Block, ItemType.Dirt, "Dirt Block", ItemQuality.Common, 1, 999),
-			new ItemPreset(ItemGroup.Block, ItemType.Stone, "Stone Block", ItemQuality.Common, 2, 999)
+			new ItemPreset(ItemGroup.Block, ItemType.Stone, "Stone Block", ItemQuality.Common, 2, 999),
+			new ItemPreset(ItemGroup.Block, ItemType.IronOre, "Iron Ore", ItemQuality.Common, 3, 999)
 		});
 
 	public struct ItemPreset {
